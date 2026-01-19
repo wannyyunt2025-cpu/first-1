@@ -2,8 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { Comment } from '@/types';
 import { 
   getComments, 
-  getApprovedComments, 
-  getPendingComments,
   addComment, 
   updateComment, 
   deleteComment, 
@@ -11,6 +9,7 @@ import {
 } from '@/lib/storage';
 import { database, isDatabaseAvailable } from '@/lib/database';
 import { useToast } from '@/hooks/use-toast';
+import { saveComments } from '@/lib/storage';
 
 // 敏感词列表（简化版）
 const SENSITIVE_WORDS = [
@@ -24,13 +23,23 @@ export function useComments() {
   const { toast } = useToast();
 
   const loadData = useCallback(async () => {
+    const localComments = getComments();
+    setComments(localComments);
+
     if (await isDatabaseAvailable()) {
       try {
-        const data = await database.getComments();
-        if (data && data.length > 0) {
-          setComments(data);
-          saveComments(data);
-        }
+        const remoteComments = await database.getComments();
+        const mergedById = new Map<string, Comment>();
+
+        for (const c of localComments) mergedById.set(c.id, c);
+        for (const c of remoteComments) mergedById.set(c.id, c);
+
+        const merged = Array.from(mergedById.values()).sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        setComments(merged);
+        saveComments(merged);
       } catch (error) {
         console.error('Failed to load comments:', error);
       }
@@ -71,7 +80,10 @@ export function useComments() {
 
       // Remote
       if (await isDatabaseAvailable()) {
-        await database.createComment(newComment);
+        const created = await database.createComment(newComment);
+        if (!created) {
+          return { success: true, message: '留言已保存到本地，云端同步失败（不影响本机管理后台查看）' };
+        }
       }
       
       return { success: true, message: '留言提交成功，等待审核' };
@@ -177,6 +189,3 @@ export function useComments() {
     refresh,
   };
 }
-
-// 补充 import 需要的 saveComments 函数
-import { saveComments } from '@/lib/storage';

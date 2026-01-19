@@ -535,11 +535,11 @@ export const database = {
     return this.getComments('approved');
   },
   
-  async createComment(comment: Omit<Comment, 'id'>): Promise<Comment | null> {
+  async createComment(comment: Comment): Promise<Comment | null> {
     const dbData = mapCommentToDB(comment);
     const { data, error } = await supabase
       .from('comments')
-      .insert(dbData)
+      .insert({ id: comment.id, ...dbData })
       .select()
       .single();
     

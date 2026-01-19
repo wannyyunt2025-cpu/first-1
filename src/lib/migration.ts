@@ -235,11 +235,13 @@ export async function migrateToDatabase(
       
       if (!exists) {
         await database.createComment({
+          id: storage.generateId(),
           nickname: comment.nickname,
           content: comment.content,
+          createdAt: comment.createdAt,
           status: comment.status,
           reply: comment.reply,
-          reply_at: comment.replyAt,
+          replyAt: comment.replyAt,
         });
       }
     }
