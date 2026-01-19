@@ -1,6 +1,104 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import type { Profile, Skill, Project, Education, Portfolio, Comment } from '@/types';
 
+// ============================================
+// Data Mappers
+// ============================================
+
+const mapProfileFromDB = (data: any): Profile => ({
+  id: data.id,
+  name: data.name,
+  title: data.title,
+  slogan: data.slogan,
+  avatar: data.avatar,
+  contact: {
+    email: data.email,
+    wechat: data.wechat,
+    phone: data.phone,
+  },
+  visibility: {
+    email: data.email_visibility,
+    wechat: data.wechat_visibility,
+    phone: data.phone_visibility,
+  },
+});
+
+const mapProfileToDB = (profile: Partial<Profile>): any => {
+  const dbData: any = {};
+  if (profile.name !== undefined) dbData.name = profile.name;
+  if (profile.title !== undefined) dbData.title = profile.title;
+  if (profile.slogan !== undefined) dbData.slogan = profile.slogan;
+  if (profile.avatar !== undefined) dbData.avatar = profile.avatar;
+  
+  if (profile.contact) {
+    if (profile.contact.email !== undefined) dbData.email = profile.contact.email;
+    if (profile.contact.wechat !== undefined) dbData.wechat = profile.contact.wechat;
+    if (profile.contact.phone !== undefined) dbData.phone = profile.contact.phone;
+  }
+  
+  if (profile.visibility) {
+    if (profile.visibility.email !== undefined) dbData.email_visibility = profile.visibility.email;
+    if (profile.visibility.wechat !== undefined) dbData.wechat_visibility = profile.visibility.wechat;
+    if (profile.visibility.phone !== undefined) dbData.phone_visibility = profile.visibility.phone;
+  }
+  
+  return dbData;
+};
+
+const mapProjectFromDB = (data: any): Project => ({
+  ...data,
+  startDate: data.start_date,
+  endDate: data.end_date,
+  isPublic: data.is_public,
+  sortOrder: data.sort_order,
+});
+
+const mapProjectToDB = (project: Partial<Project>): any => {
+  const dbData: any = { ...project };
+  if (project.startDate !== undefined) dbData.start_date = project.startDate;
+  if (project.endDate !== undefined) dbData.end_date = project.endDate;
+  if (project.isPublic !== undefined) dbData.is_public = project.isPublic;
+  if (project.sortOrder !== undefined) dbData.sort_order = project.sortOrder;
+  
+  delete dbData.startDate;
+  delete dbData.endDate;
+  delete dbData.isPublic;
+  delete dbData.sortOrder;
+  return dbData;
+};
+
+const mapEducationFromDB = (data: any): Education => ({
+  ...data,
+  startDate: data.start_date,
+  endDate: data.end_date,
+});
+
+const mapEducationToDB = (edu: Partial<Education>): any => {
+  const dbData: any = { ...edu };
+  if (edu.startDate !== undefined) dbData.start_date = edu.startDate;
+  if (edu.endDate !== undefined) dbData.end_date = edu.endDate;
+  
+  delete dbData.startDate;
+  delete dbData.endDate;
+  return dbData;
+};
+
+const mapCommentFromDB = (data: any): Comment => ({
+  ...data,
+  createdAt: data.created_at,
+  replyAt: data.reply_at,
+});
+
+const mapCommentToDB = (comment: Partial<Comment>): any => {
+  const dbData: any = { ...comment };
+  if (comment.createdAt !== undefined) dbData.created_at = comment.createdAt;
+  if (comment.replyAt !== undefined) dbData.reply_at = comment.replyAt;
+  
+  delete dbData.createdAt;
+  delete dbData.replyAt;
+  return dbData;
+};
+
 /**
  * 数据库服务层
  * 提供统一的数据访问接口，封装Supabase操作
@@ -17,17 +115,18 @@ export const database = {
       .single();
     
     if (error) {
-      console.error('获取个人信息失败:', error);
+      // console.error('获取个人信息失败:', error);
       return null;
     }
     
-    return data as Profile;
+    return mapProfileFromDB(data);
   },
   
-  async createProfile(profile: Omit<Profile, 'id' | 'created_at' | 'updated_at'>): Promise<Profile | null> {
+  async createProfile(profile: Omit<Profile, 'id'>): Promise<Profile | null> {
+    const dbData = mapProfileToDB(profile);
     const { data, error } = await supabase
       .from('profiles')
-      .insert(profile)
+      .insert(dbData)
       .select()
       .single();
     
@@ -36,13 +135,14 @@ export const database = {
       return null;
     }
     
-    return data as Profile;
+    return mapProfileFromDB(data);
   },
   
   async updateProfile(profileId: string, updates: Partial<Profile>): Promise<boolean> {
+    const dbData = mapProfileToDB(updates);
     const { error } = await supabase
       .from('profiles')
-      .update(updates)
+      .update(dbData)
       .eq('id', profileId);
     
     if (error) {
@@ -71,7 +171,11 @@ export const database = {
     return data as Skill[];
   },
   
-  async createSkill(skill: Omit<Skill, 'id' | 'created_at' | 'updated_at'>): Promise<Skill | null> {
+  async createSkill(skill: Omit<Skill, 'id'>): Promise<Skill | null> {
+    const { id, ...rest } = skill as any; // Remove ID if present, let DB generate it or use it? 
+    // Usually let DB generate ID. But our local logic generates ID. 
+    // If we want to sync local ID to DB, we should include it.
+    // Supabase allows inserting ID.
     const { data, error } = await supabase
       .from('skills')
       .insert(skill)
@@ -135,7 +239,7 @@ export const database = {
       return [];
     }
     
-    return data as Project[];
+    return data.map(mapProjectFromDB);
   },
   
   async getProjectById(projectId: string): Promise<Project | null> {
@@ -150,13 +254,14 @@ export const database = {
       return null;
     }
     
-    return data as Project;
+    return mapProjectFromDB(data);
   },
   
-  async createProject(project: Omit<Project, 'id' | 'created_at' | 'updated_at'>): Promise<Project | null> {
+  async createProject(project: Omit<Project, 'id'>): Promise<Project | null> {
+    const dbData = mapProjectToDB(project);
     const { data, error } = await supabase
       .from('projects')
-      .insert(project)
+      .insert(dbData)
       .select()
       .single();
     
@@ -165,13 +270,14 @@ export const database = {
       return null;
     }
     
-    return data as Project;
+    return mapProjectFromDB(data);
   },
   
   async updateProject(projectId: string, updates: Partial<Project>): Promise<boolean> {
+    const dbData = mapProjectToDB(updates);
     const { error } = await supabase
       .from('projects')
-      .update(updates)
+      .update(dbData)
       .eq('id', projectId);
     
     if (error) {
@@ -211,13 +317,14 @@ export const database = {
       return [];
     }
     
-    return data as Education[];
+    return data.map(mapEducationFromDB);
   },
   
-  async createEducation(education: Omit<Education, 'id' | 'created_at' | 'updated_at'>): Promise<Education | null> {
+  async createEducation(education: Omit<Education, 'id'>): Promise<Education | null> {
+    const dbData = mapEducationToDB(education);
     const { data, error } = await supabase
       .from('education')
-      .insert(education)
+      .insert(dbData)
       .select()
       .single();
     
@@ -226,13 +333,14 @@ export const database = {
       return null;
     }
     
-    return data as Education;
+    return mapEducationFromDB(data);
   },
   
   async updateEducation(educationId: string, updates: Partial<Education>): Promise<boolean> {
+    const dbData = mapEducationToDB(updates);
     const { error } = await supabase
       .from('education')
-      .update(updates)
+      .update(dbData)
       .eq('id', educationId);
     
     if (error) {
@@ -275,7 +383,7 @@ export const database = {
     return data as Portfolio[];
   },
   
-  async createPortfolio(portfolio: Omit<Portfolio, 'id' | 'created_at' | 'updated_at'>): Promise<Portfolio | null> {
+  async createPortfolio(portfolio: Omit<Portfolio, 'id'>): Promise<Portfolio | null> {
     const { data, error } = await supabase
       .from('portfolios')
       .insert(portfolio)
@@ -339,17 +447,18 @@ export const database = {
       return [];
     }
     
-    return data as Comment[];
+    return data.map(mapCommentFromDB);
   },
   
   async getApprovedComments(): Promise<Comment[]> {
     return this.getComments('approved');
   },
   
-  async createComment(comment: Omit<Comment, 'id' | 'created_at' | 'updated_at'>): Promise<Comment | null> {
+  async createComment(comment: Omit<Comment, 'id'>): Promise<Comment | null> {
+    const dbData = mapCommentToDB(comment);
     const { data, error } = await supabase
       .from('comments')
-      .insert(comment)
+      .insert(dbData)
       .select()
       .single();
     
@@ -358,13 +467,14 @@ export const database = {
       return null;
     }
     
-    return data as Comment;
+    return mapCommentFromDB(data);
   },
   
   async updateComment(commentId: string, updates: Partial<Comment>): Promise<boolean> {
+    const dbData = mapCommentToDB(updates);
     const { error } = await supabase
       .from('comments')
-      .update(updates)
+      .update(dbData)
       .eq('id', commentId);
     
     if (error) {
