@@ -11,9 +11,9 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, isLoading, login } = useAuth();
   const { toast } = useToast();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,37 +28,33 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!username || !password) {
+    if (!email || !password) {
       toast({
         title: '请填写完整',
-        description: '请输入账号和密码',
+        description: '请输入邮箱和密码',
         variant: 'destructive',
       });
       return;
     }
 
     setIsSubmitting(true);
-    
-    // 模拟异步登录
-    setTimeout(() => {
-      const success = login(username, password);
-      
-      if (success) {
-        toast({
-          title: '登录成功',
-          description: '欢迎回来！',
-        });
-        navigate('/admin');
-      } else {
-        toast({
-          title: '登录失败',
-          description: '账号或密码错误',
-          variant: 'destructive',
-        });
-      }
-      
-      setIsSubmitting(false);
-    }, 500);
+
+    const result = await login(email, password);
+    if (result.success) {
+      toast({
+        title: '登录成功',
+        description: '欢迎回来！',
+      });
+      navigate('/admin');
+    } else {
+      toast({
+        title: '登录失败',
+        description: result.message || '邮箱或密码错误',
+        variant: 'destructive',
+      });
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -111,17 +107,17 @@ export default function Login() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">账号</Label>
+                <Label htmlFor="email">邮箱</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="请输入账号"
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="请输入邮箱"
                     className="pl-10 bg-secondary/50"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isLoading}
                   />
                 </div>
               </div>
@@ -137,7 +133,7 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="请输入密码"
                     className="pl-10 pr-10 bg-secondary/50"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isLoading}
                   />
                   <button
                     type="button"
@@ -156,7 +152,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isLoading}
                 className="w-full bg-gradient-primary hover:opacity-90 gap-2 h-11"
               >
                 {isSubmitting ? (
@@ -185,17 +181,6 @@ export default function Login() {
           </CardContent>
         </Card>
 
-        {/* Hint for demo */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-6 text-center text-xs text-muted-foreground"
-        >
-          <p className="bg-secondary/30 px-4 py-2 rounded-lg inline-block">
-            提示：管理员账号已配置
-          </p>
-        </motion.div>
       </motion.div>
     </div>
   );

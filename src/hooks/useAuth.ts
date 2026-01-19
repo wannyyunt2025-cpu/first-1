@@ -2,29 +2,46 @@ import { useState, useEffect, useCallback } from 'react';
 import { login as authLogin, logout as authLogout, isAuthenticated as checkAuth } from '@/lib/auth';
 
 export function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => checkAuth());
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setIsAuthenticated(checkAuth());
+    let isMounted = true;
+    setIsLoading(true);
+    checkAuth()
+      .then((authed) => {
+        if (isMounted) setIsAuthenticated(authed);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const login = useCallback((username: string, password: string): boolean => {
+  const login = useCallback(async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
     setIsLoading(true);
     try {
-      const success = authLogin(username, password);
-      if (success) {
+      const result = await authLogin(email, password);
+      if (result.success) {
         setIsAuthenticated(true);
       }
-      return success;
+      return result;
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const logout = useCallback(() => {
-    authLogout();
-    setIsAuthenticated(false);
+  const logout = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await authLogout();
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   return {

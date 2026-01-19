@@ -1,40 +1,29 @@
-// 简单的认证工具
-const AUTH_STORAGE_KEY = 'portfolio_auth_token';
-const ADMIN_USERNAME = '1302907151';
-const ADMIN_PASSWORD = '258022';
+import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 
-// 生成简单的token
-function generateToken(username: string): string {
-  return btoa(`${username}:${Date.now()}`);
-}
-
-// 验证凭据
-export function validateCredentials(username: string, password: string): boolean {
-  return username === ADMIN_USERNAME && password === ADMIN_PASSWORD;
-}
-
-// 登录
-export function login(username: string, password: string): boolean {
-  if (validateCredentials(username, password)) {
-    const token = generateToken(username);
-    localStorage.setItem(AUTH_STORAGE_KEY, token);
-    return true;
+export async function login(email: string, password: string): Promise<{ success: boolean; message?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { success: false, message: "Supabase 未配置，请先设置环境变量" }
   }
-  return false;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+
+  if (error) {
+    return { success: false, message: error.message }
+  }
+
+  return { success: true }
 }
 
-// 登出
-export function logout(): void {
-  localStorage.removeItem(AUTH_STORAGE_KEY);
+export async function logout(): Promise<void> {
+  if (!isSupabaseConfigured()) return
+  await supabase.auth.signOut()
 }
 
-// 检查是否已登录
-export function isAuthenticated(): boolean {
-  const token = localStorage.getItem(AUTH_STORAGE_KEY);
-  return !!token;
-}
-
-// 获取token
-export function getToken(): string | null {
-  return localStorage.getItem(AUTH_STORAGE_KEY);
+export async function isAuthenticated(): Promise<boolean> {
+  if (!isSupabaseConfigured()) return false
+  const { data } = await supabase.auth.getSession()
+  return Boolean(data.session)
 }

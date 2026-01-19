@@ -21,8 +21,8 @@ export default function Admin() {
   const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     toast({
       title: '已登出',
       description: '您已安全登出',

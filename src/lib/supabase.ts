@@ -21,9 +21,8 @@ function getSupabaseClient(): SupabaseClient | null {
   if (!_supabaseClient) {
     _supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        // 暂不使用Supabase Auth，保持现有localStorage认证
-        persistSession: false,
-        autoRefreshToken: false,
+        persistSession: true,
+        autoRefreshToken: true,
       },
     });
   }
