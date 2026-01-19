@@ -107,7 +107,7 @@ export function SkillCloud() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="text-center text-sm text-muted-foreground mt-8"
+          className="text-center text-base text-muted-foreground mt-8"
         >
           以及更多技术栈...
         </motion.p>

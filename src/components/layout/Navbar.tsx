@@ -63,7 +63,7 @@ export function Navbar() {
           {/* Logo */}
           <Link 
             to="/" 
-            className="text-xl font-bold text-gradient-primary"
+            className="text-xl font-bold text-gradient-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
           >
             Portfolio
           </Link>
@@ -75,8 +75,8 @@ export function Navbar() {
                 key={link.href}
                 onClick={() => handleNavClick(link.href)}
                 className={cn(
-                  'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
-                  'text-muted-foreground hover:text-primary hover:bg-primary/10'
+                  'inline-flex min-h-11 items-center px-4 rounded-lg transition-all duration-200 text-base font-medium',
+                  'text-muted-foreground hover:text-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
                 )}
               >
                 {link.label}
@@ -115,8 +115,12 @@ export function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 text-foreground"
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            aria-label={isMobileMenuOpen ? '关闭菜单' : '打开菜单'}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
@@ -124,7 +128,7 @@ export function Navbar() {
             ) : (
               <Menu className="h-6 w-6" />
             )}
-          </button>
+          </Button>
         </nav>
 
         {/* Mobile Menu */}
@@ -140,7 +144,7 @@ export function Navbar() {
                 <button
                   key={link.href}
                   onClick={() => handleNavClick(link.href)}
-                  className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary text-left"
+                  className="min-h-11 px-4 py-3 text-base font-medium text-muted-foreground hover:text-primary text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   {link.label}
                 </button>

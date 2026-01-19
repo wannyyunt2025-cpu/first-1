@@ -45,7 +45,7 @@ export function useProfile() {
         } else {
           // 如果是第一次创建，排除ID让数据库生成
           const { id, ...rest } = newProfile;
-          await database.createProfile(rest as any);
+          await database.createProfile(rest);
         }
       }
       

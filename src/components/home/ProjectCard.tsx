@@ -37,13 +37,13 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
               <h3 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
                 {project.name}
               </h3>
-              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-3 text-base text-muted-foreground">
                 <span className="flex items-center gap-1">
-                  <User className="h-3.5 w-3.5" />
+                  <User className="h-4 w-4" />
                   {project.role}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Calendar className="h-3.5 w-3.5" />
+                  <Calendar className="h-4 w-4" />
                   {formatDateRange(project.startDate, project.endDate)}
                 </span>
               </div>
@@ -54,8 +54,8 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
         <CardContent className="space-y-4">
           {/* Key Result - Highlighted */}
           <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-            <p className="text-sm font-medium text-primary mb-1">Key Result</p>
-            <p className="text-sm text-foreground line-clamp-2">
+            <p className="text-base font-medium text-primary mb-1">Key Result</p>
+            <p className="text-base text-foreground line-clamp-2">
               {project.result}
             </p>
           </div>
@@ -66,13 +66,13 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
               <Badge 
                 key={idx} 
                 variant="secondary"
-                className="text-xs bg-secondary/50 text-secondary-foreground hover:bg-secondary/70"
+                className="text-sm bg-secondary/50 text-secondary-foreground hover:bg-secondary/70"
               >
                 {keyword}
               </Badge>
             ))}
             {project.keywords.length > 4 && (
-              <Badge variant="outline" className="text-xs text-muted-foreground">
+              <Badge variant="outline" className="text-sm text-muted-foreground">
                 +{project.keywords.length - 4}
               </Badge>
             )}

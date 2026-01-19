@@ -85,7 +85,7 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">{item.label}</p>
+                    <p className="text-base text-muted-foreground">{item.label}</p>
                     <p className="font-medium text-foreground">{displayValue}</p>
                   </div>
                 </div>
@@ -94,6 +94,7 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
                   size="icon"
                   onClick={() => handleCopy(displayValue, item.key)}
                   className="shrink-0 text-muted-foreground hover:text-primary"
+                  aria-label={`复制${item.label}`}
                 >
                   <AnimatePresence mode="wait">
                     {isCopied ? (
@@ -129,7 +130,7 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
         </div>
 
         <div className="text-center">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             请尊重隐私，仅用于正当沟通目的
           </p>
         </div>

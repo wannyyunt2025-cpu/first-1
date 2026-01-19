@@ -5,97 +5,182 @@ import type { Profile, Skill, Project, Education, Portfolio, Comment } from '@/t
 // Data Mappers
 // ============================================
 
-const mapProfileFromDB = (data: any): Profile => ({
+type ProfileRow = {
+  id: string;
+  name: string;
+  title: string;
+  slogan: string;
+  avatar: string | null;
+  email: string;
+  wechat: string;
+  phone: string | null;
+  email_visibility: Profile['visibility']['email'];
+  wechat_visibility: Profile['visibility']['wechat'];
+  phone_visibility: Profile['visibility']['phone'];
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ProfileUpsert = Partial<Omit<ProfileRow, 'id' | 'created_at' | 'updated_at'>>;
+
+const mapProfileFromDB = (data: ProfileRow): Profile => ({
   id: data.id,
-  name: data.name,
-  title: data.title,
-  slogan: data.slogan,
-  avatar: data.avatar,
+  name: data.name ?? '',
+  title: data.title ?? '',
+  slogan: data.slogan ?? '',
+  avatar: data.avatar ?? undefined,
   contact: {
-    email: data.email,
-    wechat: data.wechat,
-    phone: data.phone,
+    email: data.email ?? '',
+    wechat: data.wechat ?? '',
+    phone: data.phone ?? undefined,
   },
   visibility: {
-    email: data.email_visibility,
-    wechat: data.wechat_visibility,
-    phone: data.phone_visibility,
+    email: data.email_visibility ?? 'semi',
+    wechat: data.wechat_visibility ?? 'semi',
+    phone: data.phone_visibility ?? 'private',
   },
 });
 
-const mapProfileToDB = (profile: Partial<Profile>): any => {
-  const dbData: any = {};
+const mapProfileToDB = (profile: Partial<Profile>): ProfileUpsert => {
+  const dbData: ProfileUpsert = {};
   if (profile.name !== undefined) dbData.name = profile.name;
   if (profile.title !== undefined) dbData.title = profile.title;
   if (profile.slogan !== undefined) dbData.slogan = profile.slogan;
-  if (profile.avatar !== undefined) dbData.avatar = profile.avatar;
-  
+  if (profile.avatar !== undefined) dbData.avatar = profile.avatar ?? null;
+
   if (profile.contact) {
     if (profile.contact.email !== undefined) dbData.email = profile.contact.email;
     if (profile.contact.wechat !== undefined) dbData.wechat = profile.contact.wechat;
-    if (profile.contact.phone !== undefined) dbData.phone = profile.contact.phone;
+    if (profile.contact.phone !== undefined) dbData.phone = profile.contact.phone ?? null;
   }
-  
+
   if (profile.visibility) {
     if (profile.visibility.email !== undefined) dbData.email_visibility = profile.visibility.email;
     if (profile.visibility.wechat !== undefined) dbData.wechat_visibility = profile.visibility.wechat;
     if (profile.visibility.phone !== undefined) dbData.phone_visibility = profile.visibility.phone;
   }
-  
+
   return dbData;
 };
 
-const mapProjectFromDB = (data: any): Project => ({
-  ...data,
-  startDate: data.start_date,
-  endDate: data.end_date,
-  isPublic: data.is_public,
-  sortOrder: data.sort_order,
+type ProjectRow = {
+  id: string;
+  name: string;
+  role: string;
+  start_date: string;
+  end_date: string;
+  situation: string | null;
+  task: string | null;
+  action: string | null;
+  result: string | null;
+  images: string[] | null;
+  keywords: string[] | null;
+  is_public: boolean;
+  sort_order: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ProjectUpsert = Partial<Omit<ProjectRow, 'id' | 'created_at' | 'updated_at'>>;
+
+const mapProjectFromDB = (data: ProjectRow): Project => ({
+  id: data.id,
+  name: data.name ?? '',
+  role: data.role ?? '',
+  startDate: data.start_date ?? '',
+  endDate: data.end_date ?? '',
+  situation: data.situation ?? '',
+  task: data.task ?? '',
+  action: data.action ?? '',
+  result: data.result ?? '',
+  images: data.images ?? [],
+  keywords: data.keywords ?? [],
+  isPublic: Boolean(data.is_public),
+  sortOrder: Number.isFinite(data.sort_order) ? data.sort_order : 0,
 });
 
-const mapProjectToDB = (project: Partial<Project>): any => {
-  const dbData: any = { ...project };
+const mapProjectToDB = (project: Partial<Project>): ProjectUpsert => {
+  const dbData: ProjectUpsert = {};
+  if (project.name !== undefined) dbData.name = project.name;
+  if (project.role !== undefined) dbData.role = project.role;
   if (project.startDate !== undefined) dbData.start_date = project.startDate;
   if (project.endDate !== undefined) dbData.end_date = project.endDate;
+  if (project.situation !== undefined) dbData.situation = project.situation ?? null;
+  if (project.task !== undefined) dbData.task = project.task ?? null;
+  if (project.action !== undefined) dbData.action = project.action ?? null;
+  if (project.result !== undefined) dbData.result = project.result ?? null;
+  if (project.images !== undefined) dbData.images = project.images ?? [];
+  if (project.keywords !== undefined) dbData.keywords = project.keywords ?? [];
   if (project.isPublic !== undefined) dbData.is_public = project.isPublic;
   if (project.sortOrder !== undefined) dbData.sort_order = project.sortOrder;
-  
-  delete dbData.startDate;
-  delete dbData.endDate;
-  delete dbData.isPublic;
-  delete dbData.sortOrder;
   return dbData;
 };
 
-const mapEducationFromDB = (data: any): Education => ({
-  ...data,
-  startDate: data.start_date,
-  endDate: data.end_date,
+type EducationRow = {
+  id: string;
+  school: string;
+  degree: string;
+  major: string;
+  start_date: string;
+  end_date: string;
+  description: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type EducationUpsert = Partial<Omit<EducationRow, 'id' | 'created_at' | 'updated_at'>>;
+
+const mapEducationFromDB = (data: EducationRow): Education => ({
+  id: data.id,
+  school: data.school ?? '',
+  degree: data.degree ?? '',
+  major: data.major ?? '',
+  startDate: data.start_date ?? '',
+  endDate: data.end_date ?? '',
+  description: data.description ?? undefined,
 });
 
-const mapEducationToDB = (edu: Partial<Education>): any => {
-  const dbData: any = { ...edu };
+const mapEducationToDB = (edu: Partial<Education>): EducationUpsert => {
+  const dbData: EducationUpsert = {};
+  if (edu.school !== undefined) dbData.school = edu.school;
+  if (edu.degree !== undefined) dbData.degree = edu.degree;
+  if (edu.major !== undefined) dbData.major = edu.major;
   if (edu.startDate !== undefined) dbData.start_date = edu.startDate;
   if (edu.endDate !== undefined) dbData.end_date = edu.endDate;
-  
-  delete dbData.startDate;
-  delete dbData.endDate;
+  if (edu.description !== undefined) dbData.description = edu.description ?? null;
   return dbData;
 };
 
-const mapCommentFromDB = (data: any): Comment => ({
-  ...data,
-  createdAt: data.created_at,
-  replyAt: data.reply_at,
+type CommentRow = {
+  id: string;
+  nickname: string | null;
+  content: string;
+  status: Comment['status'];
+  reply: string | null;
+  reply_at: string | null;
+  created_at: string;
+  updated_at?: string;
+};
+
+type CommentUpsert = Partial<Omit<CommentRow, 'id' | 'created_at' | 'updated_at'>>;
+
+const mapCommentFromDB = (data: CommentRow): Comment => ({
+  id: data.id,
+  nickname: data.nickname ?? undefined,
+  content: data.content ?? '',
+  createdAt: data.created_at ?? new Date().toISOString(),
+  status: data.status ?? 'pending',
+  reply: data.reply ?? undefined,
+  replyAt: data.reply_at ?? undefined,
 });
 
-const mapCommentToDB = (comment: Partial<Comment>): any => {
-  const dbData: any = { ...comment };
-  if (comment.createdAt !== undefined) dbData.created_at = comment.createdAt;
-  if (comment.replyAt !== undefined) dbData.reply_at = comment.replyAt;
-  
-  delete dbData.createdAt;
-  delete dbData.replyAt;
+const mapCommentToDB = (comment: Partial<Comment>): CommentUpsert => {
+  const dbData: CommentUpsert = {};
+  if (comment.nickname !== undefined) dbData.nickname = comment.nickname ?? null;
+  if (comment.content !== undefined) dbData.content = comment.content;
+  if (comment.status !== undefined) dbData.status = comment.status;
+  if (comment.reply !== undefined) dbData.reply = comment.reply ?? null;
+  if (comment.replyAt !== undefined) dbData.reply_at = comment.replyAt ?? null;
   return dbData;
 };
 
@@ -171,11 +256,7 @@ export const database = {
     return data as Skill[];
   },
   
-  async createSkill(skill: Omit<Skill, 'id'>): Promise<Skill | null> {
-    const { id, ...rest } = skill as any; // Remove ID if present, let DB generate it or use it? 
-    // Usually let DB generate ID. But our local logic generates ID. 
-    // If we want to sync local ID to DB, we should include it.
-    // Supabase allows inserting ID.
+  async createSkill(skill: Pick<Skill, 'name' | 'weight' | 'category'> & { id?: string }): Promise<Skill | null> {
     const { data, error } = await supabase
       .from('skills')
       .insert(skill)

@@ -75,7 +75,9 @@ export function CommentSection() {
                 <CardContent className="pt-6">
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
+                      <label htmlFor="comment-nickname" className="sr-only">昵称</label>
                       <Input
+                        id="comment-nickname"
                         placeholder="昵称（选填）"
                         value={nickname}
                         onChange={(e) => setNickname(e.target.value)}
@@ -84,16 +86,19 @@ export function CommentSection() {
                       />
                     </div>
                     <div>
+                      <label htmlFor="comment-content" className="sr-only">留言内容</label>
                       <Textarea
+                        id="comment-content"
                         placeholder="写下你的留言... (5-500字)"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         rows={4}
                         maxLength={500}
+                        aria-describedby="comment-content-counter"
                         className="bg-secondary/50 border-border focus:border-primary resize-none"
                       />
                       <div className="flex justify-between mt-1">
-                        <span className="text-xs text-muted-foreground">
+                        <span id="comment-content-counter" className="text-sm text-muted-foreground">
                           {content.length}/500
                         </span>
                       </div>
@@ -143,21 +148,21 @@ export function CommentSection() {
                               <User className="h-4 w-4 text-primary" />
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-foreground">
+                              <p className="text-base font-medium text-foreground">
                                 {comment.nickname || '匿名用户'}
                               </p>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-sm text-muted-foreground">
                                 {formatDate(comment.createdAt)}
                               </p>
                             </div>
                           </div>
-                          <p className="text-sm text-foreground/90 pl-10">
+                          <p className="text-base text-foreground/90 pl-10">
                             {comment.content}
                           </p>
                           {comment.reply && (
                             <div className="mt-3 ml-10 p-3 rounded-lg bg-primary/5 border-l-2 border-primary">
-                              <p className="text-xs text-primary mb-1">作者回复</p>
-                              <p className="text-sm text-foreground/80">
+                              <p className="text-sm text-primary mb-1">作者回复</p>
+                              <p className="text-base text-foreground/80">
                                 {comment.reply}
                               </p>
                             </div>

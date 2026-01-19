@@ -128,7 +128,7 @@ export function HeroSection() {
                 }
               }}
             >
-              <span className="text-sm font-medium">向下滚动</span>
+              <span className="text-base font-medium">向下滚动</span>
               <ArrowDown className="h-5 w-5" />
             </motion.div>
           </motion.div>

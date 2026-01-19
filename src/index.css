@@ -30,7 +30,7 @@
     --secondary-foreground: 240 5% 98%;
 
     --muted: 240 6% 20%;
-    --muted-foreground: 240 5% 55%;
+    --muted-foreground: 240 5% 65%;
 
     --accent: 192 91% 42%;
     --accent-foreground: 240 6% 12%;
@@ -90,7 +90,7 @@
     --secondary-foreground: 240 5% 98%;
 
     --muted: 240 6% 20%;
-    --muted-foreground: 240 5% 55%;
+    --muted-foreground: 240 5% 65%;
 
     --accent: 192 91% 42%;
     --accent-foreground: 240 6% 12%;
@@ -120,6 +120,8 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+    font-size: 1rem;
+    line-height: 1.5;
   }
 }
 
@@ -132,6 +134,7 @@ body,
 
 html {
   scroll-behavior: smooth;
+  font-size: 16px;
 }
 
 /* Custom scrollbar for dark theme */
@@ -163,8 +166,8 @@ html {
 
 /* Glass effect utility */
 .glass {
-  background: hsl(var(--background) / 0.8);
-  backdrop-filter: blur(12px);
+  background: hsl(var(--background) / 0.9);
+  backdrop-filter: blur(10px);
 }
 
 /* Watermark for contact modal */
