@@ -14,10 +14,10 @@ export function CommentSection() {
   const [nickname, setNickname] = useState('');
   const [content, setContent] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const result = submit(content, nickname);
+    const result = await submit(content, nickname);
     
     if (result.success) {
       toast({
