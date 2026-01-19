@@ -135,74 +135,113 @@ export async function migrateToDatabase(
     // Step 2: 迁移技能
     updateProgress('skills', 2, 7, 'running', '正在迁移技能...');
     const localSkills = storage.getSkills();
+    const existingSkills = await database.getSkills();
     for (const skill of localSkills) {
-      await database.createSkill({
-        name: skill.name,
-        weight: skill.weight,
-        category: skill.category,
-      });
+      // 检查是否已存在（根据名称）
+      const exists = existingSkills.some(s => s.name === skill.name);
+      if (!exists) {
+        await database.createSkill({
+          name: skill.name,
+          weight: skill.weight,
+          category: skill.category,
+        });
+      }
     }
     updateProgress('skills', 2, 7, 'success', `已迁移 ${localSkills.length} 个技能`);
 
     // Step 3: 迁移项目
     updateProgress('projects', 3, 7, 'running', '正在迁移项目...');
     const localProjects = storage.getProjects();
+    const existingProjects = await database.getProjects();
     for (const project of localProjects) {
-      await database.createProject({
-        name: project.name,
-        role: project.role,
-        start_date: project.startDate,
-        end_date: project.endDate,
-        situation: project.situation,
-        task: project.task,
-        action: project.action,
-        result: project.result,
-        images: project.images,
-        keywords: project.keywords,
-        is_public: project.isPublic,
-        sort_order: project.sortOrder,
-      });
+      // 检查是否已存在（根据名称）
+      const exists = existingProjects.some(p => p.name === project.name);
+      if (!exists) {
+        await database.createProject({
+          name: project.name,
+          role: project.role,
+          start_date: project.startDate,
+          end_date: project.endDate,
+          situation: project.situation,
+          task: project.task,
+          action: project.action,
+          result: project.result,
+          images: project.images,
+          keywords: project.keywords,
+          is_public: project.isPublic,
+          sort_order: project.sortOrder,
+        });
+      }
     }
     updateProgress('projects', 3, 7, 'success', `已迁移 ${localProjects.length} 个项目`);
 
     // Step 4: 迁移教育背景
     updateProgress('education', 4, 7, 'running', '正在迁移教育背景...');
     const localEducation = storage.getEducation();
+    const existingEducation = await database.getEducation();
     for (const edu of localEducation) {
-      await database.createEducation({
-        school: edu.school,
-        degree: edu.degree,
-        major: edu.major,
-        start_date: edu.startDate,
-        end_date: edu.endDate,
-        description: edu.description,
-      });
+      // 检查是否已存在（根据学校+专业+学位）
+      const exists = existingEducation.some(e => 
+        e.school === edu.school && 
+        e.major === edu.major && 
+        e.degree === edu.degree
+      );
+      if (!exists) {
+        await database.createEducation({
+          school: edu.school,
+          degree: edu.degree,
+          major: edu.major,
+          start_date: edu.startDate,
+          end_date: edu.endDate,
+          description: edu.description,
+        });
+      }
     }
     updateProgress('education', 4, 7, 'success', `已迁移 ${localEducation.length} 条教育背景`);
 
     // Step 5: 迁移作品集
     updateProgress('portfolios', 5, 7, 'running', '正在迁移作品集...');
     const localPortfolios = storage.getPortfolios();
+    const existingPortfolios = await database.getPortfolios();
     for (const portfolio of localPortfolios) {
-      await database.createPortfolio({
-        title: portfolio.title,
-        url: portfolio.url,
-        type: portfolio.type,
-      });
+      // 检查是否已存在（根据标题+链接）
+      const exists = existingPortfolios.some(p => 
+        p.title === portfolio.title && 
+        p.url === portfolio.url
+      );
+      if (!exists) {
+        await database.createPortfolio({
+          title: portfolio.title,
+          url: portfolio.url,
+          type: portfolio.type,
+        });
+      }
     }
     updateProgress('portfolios', 5, 7, 'success', `已迁移 ${localPortfolios.length} 个作品集`);
 
     // Step 6: 迁移留言
     updateProgress('comments', 6, 7, 'running', '正在迁移留言...');
     const localComments = storage.getAllComments();
+    const existingComments = await database.getComments();
     for (const comment of localComments) {
-      await database.createComment({
-        nickname: comment.nickname,
-        content: comment.content,
-        status: comment.status,
-        reply: comment.reply,
-        reply_at: comment.replyAt,
-      });
+      // 检查是否已存在（根据内容+昵称）
+      // 注意：留言内容可能很长，这里简单对比内容前50个字符和昵称
+      const exists = existingComments.some(c => 
+        c.content === comment.content && 
+        c.nickname === comment.nickname &&
+        // 如果创建时间非常接近（例如1秒内），也认为是同一条
+        Math.abs(new Date(c.createdAt).getTime() - new Date(comment.createdAt).getTime()) < 1000
+      );
+      
+      if (!exists) {
+        await database.createComment({
+          nickname: comment.nickname,
+          content: comment.content,
+          status: comment.status,
+          reply: comment.reply,
+          reply_at: comment.replyAt,
+        });
+      }
     }
     updateProgress('comments', 6, 7, 'success', `已迁移 ${localComments.length} 条留言`);
 
