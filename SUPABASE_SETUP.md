@@ -93,7 +93,19 @@ pnpm dev
 3. 粘贴到Supabase SQL Editor中
 4. 点击右下角的"Run"按钮执行
 
-### 4.3 验证表创建
+### 4.3（强烈推荐）修复/加固留言（comments）权限策略
+如果你遇到“留言已保存到本地，但云端同步失败”，最常见原因是 **RLS/GRANT 权限不完整** 或策略不符合预期。
+
+1. 打开项目中的 `supabase/migrations/002_comments_rls_and_grants.sql`
+2. 复制全部内容
+3. 粘贴到Supabase SQL Editor中执行
+
+执行后效果：
+- 访客：可以插入留言（只允许 `pending`），并且只能读取 `approved`
+- 管理员：可查看/审核/回复/删除所有留言（需要使用 Supabase Auth 登录后台，并把账号加入 `public.admins` 表）
+- 同时补齐 `GRANT`，避免“策略通过但权限不足”导致插入失败
+
+### 4.4 验证表创建
 执行成功后，你会看到：
 - ✅ Success: No rows returned
 
@@ -187,10 +199,16 @@ pnpm dev
 **A**: 
 1. 确认数据库表已正确创建
 2. 检查浏览器控制台的错误信息
-3. 确认RLS策略已正确配置
+3. 确认RLS策略已正确配置（尤其是 comments 的 INSERT 策略 + GRANT）
 
 ### Q4: 留言无法显示？
 **A**: 留言需要状态为`approved`才会在前台显示。在管理后台审核留言后即可。
+
+### Q6: 为什么我能写入留言，但后台看不到所有留言？
+**A**: 如果你启用了更安全的策略（只允许公开读取 `approved`），那么后台要查看 `pending/rejected` 需要管理员身份。
+
+推荐做法是使用 Supabase Auth 登录后台，并在 `public.admins` 表里加入你的管理员用户 id（见 `supabase/migrations/002_comments_rls_and_grants.sql`）。
+如果你不想接入 Auth，则需要用 Edge Function + `service_role` 来做后台审核接口（不要把 `service_role` 暴露给前端）。
 
 ### Q5: 如何回退到localStorage？
 **A**: 
