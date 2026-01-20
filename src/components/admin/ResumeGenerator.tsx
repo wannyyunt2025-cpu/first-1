@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Download, RefreshCw, Sparkles, Calendar, User, Target, Zap, Trophy } from 'lucide-react';
+import { FileText, Download, RefreshCw, Sparkles, Calendar, User, Target, Zap, Trophy, Bot, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 import { rankProjectsByJD, parseJD, getMatchedKeywords } from '@/lib/jdParser';
 import { getEducation } from '@/lib/storage';
 import { Project } from '@/types';
+import { generateResume } from '@/lib/bailian';
+import ReactMarkdown from 'react-markdown';
 
 export function ResumeGenerator() {
   const { toast } = useToast();
@@ -23,6 +25,8 @@ export function ResumeGenerator() {
   const [rankedProjects, setRankedProjects] = useState<Project[]>([]);
   const [isGenerated, setIsGenerated] = useState(false);
   const [matchedKeywords, setMatchedKeywords] = useState<string[]>([]);
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
+  const [aiResult, setAiResult] = useState('');
 
   const education = getEducation();
   const topSkills = getTopSkills(10);
@@ -45,9 +49,72 @@ export function ResumeGenerator() {
     setIsGenerated(true);
 
     toast({
-      title: '生成成功',
+      title: '匹配完成',
       description: `匹配到 ${parsed.keywords.length} 个关键词`,
     });
+  };
+
+  const handleAiGenerate = async () => {
+    if (!jdText.trim()) {
+      toast({
+        title: '请输入JD',
+        description: '请粘贴目标岗位的职位描述',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsAiGenerating(true);
+    setAiResult('');
+    
+    try {
+      // 构建Prompt
+      const prompt = `
+请根据以下求职者的信息和目标岗位JD，生成一份专业的简历。
+要求：
+1. 突出求职者与JD匹配的技能和项目经历
+2. 使用专业、简洁的语言
+3. 输出为Markdown格式
+
+【求职者信息】
+姓名：${profile?.name || '未填写'}
+职位：${profile?.title || '未填写'}
+个人优势：${profile?.slogan || '未填写'}
+技能：${topSkills.map(s => s.name).join(', ')}
+
+【项目经历】
+${rankedProjects.slice(0, 3).map(p => `
+项目：${p.name}
+角色：${p.role}
+背景：${p.situation}
+任务：${p.task}
+行动：${p.action}
+结果：${p.result}
+`).join('\n')}
+
+【教育背景】
+${education.map(e => `${e.school} ${e.major} ${e.degree}`).join('\n')}
+
+【目标岗位JD】
+${jdText}
+      `;
+
+      const result = await generateResume(prompt);
+      setAiResult(result);
+      toast({
+        title: 'AI生成成功',
+        description: '简历内容已生成',
+      });
+    } catch (error) {
+      console.error('AI生成失败:', error);
+      toast({
+        title: '生成失败',
+        description: error instanceof Error ? error.message : '请检查网络或API配置',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAiGenerating(false);
+    }
   };
 
   const handleReset = () => {
@@ -55,6 +122,7 @@ export function ResumeGenerator() {
     setRankedProjects([]);
     setIsGenerated(false);
     setMatchedKeywords([]);
+    setAiResult('');
   };
 
   const handleDownload = () => {
@@ -121,17 +189,25 @@ export function ResumeGenerator() {
             {!isGenerated ? (
               <Button onClick={handleGenerate} className="gap-2">
                 <Sparkles className="h-4 w-4" />
-                生成简历
+                智能匹配
               </Button>
             ) : (
               <>
                 <Button onClick={handleReset} variant="outline" className="gap-2">
                   <RefreshCw className="h-4 w-4" />
-                  重新生成
+                  重新开始
                 </Button>
-                <Button onClick={handleDownload} variant="outline" className="gap-2">
-                  <Download className="h-4 w-4" />
-                  下载简历
+                <Button 
+                  onClick={handleAiGenerate} 
+                  className="gap-2 bg-purple-600 hover:bg-purple-700"
+                  disabled={isAiGenerating}
+                >
+                  {isAiGenerating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Bot className="h-4 w-4" />
+                  )}
+                  {isAiGenerating ? 'AI生成中...' : '生成完整简历'}
                 </Button>
               </>
             )}
@@ -139,8 +215,32 @@ export function ResumeGenerator() {
         </CardContent>
       </Card>
 
-      {/* 简历预览区域 */}
-      {isGenerated && (
+      {/* AI 生成结果预览 */}
+      {aiResult && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <Card className="border-purple-200 shadow-lg">
+            <CardHeader className="bg-purple-50/50">
+              <CardTitle className="flex items-center gap-2 text-purple-900">
+                <Bot className="h-5 w-5" />
+                AI 生成建议
+              </CardTitle>
+              <CardDescription>
+                基于目标职位为您定制的简历内容
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="prose prose-purple max-w-none pt-6 dark:prose-invert">
+              <ReactMarkdown>{aiResult}</ReactMarkdown>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* 原始简历预览区域 */}
+      {isGenerated && !aiResult && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
