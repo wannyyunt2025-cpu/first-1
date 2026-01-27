@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, Edit2, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useToast } from '@/hooks/use-toast';
 import { Education } from '@/types';
 import { getEducation, saveEducation, generateId } from '@/lib/storage';
+import { database, isDatabaseAvailable } from '@/lib/database';
 
 const emptyEducation: Omit<Education, 'id'> = {
   school: '',
@@ -26,6 +27,24 @@ export function EducationForm() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState<Education | null>(null);
   const [formData, setFormData] = useState<Omit<Education, 'id'>>(emptyEducation);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (await isDatabaseAvailable()) {
+        try {
+          const data = await database.getEducation();
+          if (data && data.length > 0) {
+            setEducationList(data);
+            saveEducation(data); // Sync to local
+          }
+        } catch (error) {
+          console.error('Failed to load education from database:', error);
+        }
+      }
+    };
+    loadData();
+  }, []);
 
   const refresh = () => {
     setEducationList(getEducation());
@@ -50,7 +69,7 @@ export function EducationForm() {
     setIsDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.school || !formData.degree || !formData.major) {
       toast({
         title: '请填写必填字段',
@@ -60,41 +79,93 @@ export function EducationForm() {
       return;
     }
 
+    setIsLoading(true);
     let newList: Education[];
 
-    if (editingEducation) {
-      newList = educationList.map((edu) =>
-        edu.id === editingEducation.id ? { ...edu, ...formData } : edu
-      );
-      toast({
-        title: '更新成功',
-        description: `教育经历已更新`,
-      });
-    } else {
-      const newEdu: Education = {
-        id: generateId(),
-        ...formData,
-      };
-      newList = [...educationList, newEdu];
-      toast({
-        title: '添加成功',
-        description: `教育经历已添加`,
-      });
-    }
+    try {
+      if (editingEducation) {
+        // Local update
+        newList = educationList.map((edu) =>
+          edu.id === editingEducation.id ? { ...edu, ...formData } : edu
+        );
+        
+        // Database update
+        if (await isDatabaseAvailable()) {
+          await database.updateEducation(editingEducation.id, formData);
+        }
+        
+        toast({
+          title: '更新成功',
+          description: `教育经历已更新`,
+        });
+      } else {
+        // Local create
+        const newId = generateId();
+        const newEdu: Education = {
+          id: newId,
+          ...formData,
+        };
+        newList = [...educationList, newEdu];
 
-    saveEducation(newList);
-    refresh();
-    setIsDialogOpen(false);
+        // Database create
+        if (await isDatabaseAvailable()) {
+          // If we are creating in DB, we should let DB generate ID or use the one we generated if we want consistency
+          // But our createEducation takes Omit<Education, 'id'>, so it will generate a new ID
+          // For consistency, we might want to refresh from DB or just rely on local for now
+          // Actually, let's just create it. The local ID might differ from DB ID if we don't reload.
+          // Better strategy: create in DB, get result, then update local.
+          const created = await database.createEducation(formData);
+          if (created) {
+            // Replace the locally generated one with the DB one to keep IDs in sync
+             newList = [...educationList, created];
+          }
+        }
+        
+        toast({
+          title: '添加成功',
+          description: `教育经历已添加`,
+        });
+      }
+
+      saveEducation(newList);
+      setEducationList(newList);
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('Failed to save education:', error);
+      toast({
+        title: '保存失败',
+        description: '无法同步到云端数据库',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDelete = (edu: Education) => {
-    const newList = educationList.filter((e) => e.id !== edu.id);
-    saveEducation(newList);
-    refresh();
-    toast({
-      title: '删除成功',
-      description: `教育经历已删除`,
-    });
+  const handleDelete = async (edu: Education) => {
+    try {
+      // Local delete
+      const newList = educationList.filter((e) => e.id !== edu.id);
+      saveEducation(newList);
+      setEducationList(newList);
+
+      // Database delete
+      if (await isDatabaseAvailable()) {
+        await database.deleteEducation(edu.id);
+      }
+
+      toast({
+        title: '删除成功',
+        description: `教育经历已删除`,
+      });
+    } catch (error) {
+      console.error('Failed to delete education:', error);
+      toast({
+        title: '删除失败',
+        description: '无法从云端数据库删除',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
