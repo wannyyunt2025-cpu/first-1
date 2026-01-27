@@ -80,18 +80,24 @@ export function EducationForm() {
     }
 
     setIsLoading(true);
-    let newList: Education[];
 
     try {
       if (editingEducation) {
-        // Local update
-        newList = educationList.map((edu) =>
-          edu.id === editingEducation.id ? { ...edu, ...formData } : edu
-        );
-        
-        // Database update
+        // Database update first
         if (await isDatabaseAvailable()) {
           await database.updateEducation(editingEducation.id, formData);
+          
+          // Refresh list from DB to ensure consistency
+          const updatedList = await database.getEducation();
+          setEducationList(updatedList);
+          saveEducation(updatedList); // Update local cache
+        } else {
+           // Fallback for offline (optional, but keeping for safety)
+           const newList = educationList.map((edu) =>
+            edu.id === editingEducation.id ? { ...edu, ...formData } : edu
+          );
+          setEducationList(newList);
+          saveEducation(newList);
         }
         
         toast({
@@ -99,26 +105,25 @@ export function EducationForm() {
           description: `教育经历已更新`,
         });
       } else {
-        // Local create
-        const newId = generateId();
-        const newEdu: Education = {
-          id: newId,
-          ...formData,
-        };
-        newList = [...educationList, newEdu];
-
-        // Database create
+        // Database create first
         if (await isDatabaseAvailable()) {
-          // If we are creating in DB, we should let DB generate ID or use the one we generated if we want consistency
-          // But our createEducation takes Omit<Education, 'id'>, so it will generate a new ID
-          // For consistency, we might want to refresh from DB or just rely on local for now
-          // Actually, let's just create it. The local ID might differ from DB ID if we don't reload.
-          // Better strategy: create in DB, get result, then update local.
           const created = await database.createEducation(formData);
           if (created) {
-            // Replace the locally generated one with the DB one to keep IDs in sync
-             newList = [...educationList, created];
+             // Refresh list from DB to ensure sorting and ID consistency
+             const updatedList = await database.getEducation();
+             setEducationList(updatedList);
+             saveEducation(updatedList); // Update local cache
           }
+        } else {
+           // Fallback for offline
+           const newId = generateId();
+           const newEdu: Education = {
+             id: newId,
+             ...formData,
+           };
+           const newList = [...educationList, newEdu];
+           setEducationList(newList);
+           saveEducation(newList);
         }
         
         toast({
@@ -127,8 +132,6 @@ export function EducationForm() {
         });
       }
 
-      saveEducation(newList);
-      setEducationList(newList);
       setIsDialogOpen(false);
     } catch (error) {
       console.error('Failed to save education:', error);
@@ -144,14 +147,18 @@ export function EducationForm() {
 
   const handleDelete = async (edu: Education) => {
     try {
-      // Local delete
-      const newList = educationList.filter((e) => e.id !== edu.id);
-      saveEducation(newList);
-      setEducationList(newList);
-
-      // Database delete
       if (await isDatabaseAvailable()) {
         await database.deleteEducation(edu.id);
+        
+        // Refresh list from DB
+        const updatedList = await database.getEducation();
+        setEducationList(updatedList);
+        saveEducation(updatedList);
+      } else {
+        // Fallback for offline
+        const newList = educationList.filter((e) => e.id !== edu.id);
+        setEducationList(newList);
+        saveEducation(newList);
       }
 
       toast({
