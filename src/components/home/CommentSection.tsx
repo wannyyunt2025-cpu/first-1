@@ -54,7 +54,7 @@ export function CommentSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-headline-lg font-bold text-foreground mb-4">
+          <h2 id="comments-heading" className="text-3xl md:text-headline-lg font-bold text-foreground mb-4">
             留言互动
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
