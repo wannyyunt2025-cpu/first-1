@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Send, MessageCircle, User } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, MessageCircle, User, MessageSquare } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { useComments } from '@/hooks/useComments';
 import { useToast } from '@/hooks/use-toast';
 
@@ -45,135 +46,102 @@ export function CommentSection() {
   };
 
   return (
-    <section id="comments" className="py-20 md:py-32">
+    <section id="comments" className="py-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 id="comments-heading" className="text-3xl md:text-headline-lg font-bold text-foreground mb-4">
-            留言互动
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            欢迎留言交流，我会尽快回复
-          </p>
-        </motion.div>
-
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Comment Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 id="comments-heading" className="text-sm font-black uppercase tracking-[0.2em] text-primary mb-6">
+              Connect
+            </h2>
+            <h3 className="text-4xl md:text-5xl font-black text-slate-900 mb-8 tracking-tighter">
+              Let's collaborate.
+            </h3>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            {/* Form */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+              className="bg-slate-50 p-8 rounded-3xl border border-slate-100 shadow-sm"
             >
-              <Card className="bg-card border-border/50">
-                <CardContent className="pt-6">
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <label htmlFor="comment-nickname" className="sr-only">昵称</label>
-                      <Input
-                        id="comment-nickname"
-                        placeholder="昵称（选填）"
-                        value={nickname}
-                        onChange={(e) => setNickname(e.target.value)}
-                        maxLength={20}
-                        className="bg-secondary/50 border-border focus:border-primary"
-                      />
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="nickname" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Name</Label>
+                  <Input
+                    id="nickname"
+                    placeholder="Your name"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    className="bg-white border-slate-200 h-12 rounded-xl focus:ring-primary/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="content" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Message</Label>
+                  <Textarea
+                    id="content"
+                    placeholder="Tell me about your project..."
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    className="bg-white border-slate-200 min-h-[150px] rounded-xl focus:ring-primary/20 resize-none"
+                    required
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  disabled={isLoading || content.length < 5}
+                  className="w-full h-14 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all active:scale-[0.98]"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Sending...
                     </div>
-                    <div>
-                      <label htmlFor="comment-content" className="sr-only">留言内容</label>
-                      <Textarea
-                        id="comment-content"
-                        placeholder="写下你的留言... (5-500字)"
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        rows={4}
-                        maxLength={500}
-                        aria-describedby="comment-content-counter"
-                        className="bg-secondary/50 border-border focus:border-primary resize-none"
-                      />
-                      <div className="flex justify-between mt-1">
-                        <span id="comment-content-counter" className="text-sm text-muted-foreground">
-                          {content.length}/500
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <Button
-                        type="submit"
-                        disabled={isLoading || content.length < 5}
-                        className="w-full bg-gradient-primary hover:opacity-90"
-                      >
-                        <Send className="h-4 w-4 mr-2" />
-                        提交留言
-                      </Button>
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
+                  ) : (
+                    'Send Message'
+                  )}
+                </Button>
+              </form>
             </motion.div>
 
             {/* Comments List */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="space-y-4"
-            >
-              {approved.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full py-12 text-muted-foreground">
-                  <MessageCircle className="h-12 w-12 mb-4 opacity-50" />
-                  <p>还没有留言，来做第一个吧</p>
-                </div>
-              ) : (
-                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                  {approved.slice(0, 10).map((comment, index) => (
+            <div className="space-y-6">
+              <AnimatePresence mode="popLayout">
+                {approved.length > 0 ? (
+                  approved.slice(0, 4).map((comment) => (
                     <motion.div
                       key={comment.id}
                       initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.05 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="p-6 rounded-2xl border border-slate-100 bg-white shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <Card className="bg-secondary/30 border-border/30">
-                        <CardContent className="pt-4 pb-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                              <User className="h-4 w-4 text-primary" />
-                            </div>
-                            <div>
-                              <p className="text-base font-medium text-foreground">
-                                {comment.nickname || '匿名用户'}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                {formatDate(comment.createdAt)}
-                              </p>
-                            </div>
-                          </div>
-                          <p className="text-base text-foreground/90 pl-10">
-                            {comment.content}
-                          </p>
-                          {comment.reply && (
-                            <div className="mt-3 ml-10 p-3 rounded-lg bg-primary/5 border-l-2 border-primary">
-                              <p className="text-sm text-primary mb-1">作者回复</p>
-                              <p className="text-base text-foreground/80">
-                                {comment.reply}
-                              </p>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="font-bold text-slate-900">{comment.nickname || 'Anonymous'}</span>
+                        <span className="text-[10px] font-bold text-slate-300">
+                          {new Date(comment.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-slate-500 text-sm leading-relaxed italic">
+                        "{comment.content}"
+                      </p>
                     </motion.div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
+                  ))
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center py-12 text-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+                    <MessageSquare className="h-8 w-8 text-slate-200 mb-4" />
+                    <p className="text-slate-400 font-bold text-sm tracking-tight">No messages yet. Be the first!</p>
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>
