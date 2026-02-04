@@ -124,16 +124,6 @@ export default {
           "0%, 100%": { boxShadow: "0 0 20px hsla(243, 68%, 60%, 0.3)" },
           "50%": { boxShadow: "0 0 40px hsla(243, 68%, 60%, 0.5)" },
         },
-        "aurora-1": {
-          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
-          "33%": { transform: "translate(30px, -50px) scale(1.1)" },
-          "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
-        },
-        "aurora-2": {
-          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
-          "33%": { transform: "translate(-30px, 30px) scale(1.2)" },
-          "66%": { transform: "translate(20px, -40px) scale(0.8)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -145,8 +135,6 @@ export default {
         shimmer: "shimmer 2s linear infinite",
         float: "float 3s ease-in-out infinite",
         glow: "glow 2s ease-in-out infinite",
-        "aurora-1": "aurora-1 20s infinite alternate-reverse linear",
-        "aurora-2": "aurora-2 25s infinite alternate linear",
       },
       backgroundImage: {
         "gradient-primary": "var(--gradient-primary)",

@@ -14,7 +14,6 @@ import { ResumeGenerator } from '@/components/admin/ResumeGenerator';
 import { exportData, importData } from '@/lib/storage';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { cn } from '@/lib/utils';
 
 export default function Admin() {
   const { toast } = useToast();
@@ -25,8 +24,8 @@ export default function Admin() {
   const handleLogout = async () => {
     await logout();
     toast({
-      title: 'Signed Out',
-      description: 'You have been safely signed out.',
+      title: '已登出',
+      description: '您已安全登出',
     });
     navigate('/login');
   };
@@ -41,8 +40,8 @@ export default function Admin() {
     a.click();
     URL.revokeObjectURL(url);
     toast({
-      title: 'Export Successful',
-      description: 'Data has been downloaded to your device.',
+      title: '导出成功',
+      description: '数据已下载到本地',
     });
   };
 
@@ -58,14 +57,14 @@ export default function Admin() {
           const content = e.target?.result as string;
           if (importData(content)) {
             toast({
-              title: 'Import Successful',
-              description: 'Data has been updated. Refreshing...',
+              title: '导入成功',
+              description: '数据已更新，刷新页面查看',
             });
             window.location.reload();
           } else {
             toast({
-              title: 'Import Failed',
-              description: 'Invalid file format.',
+              title: '导入失败',
+              description: '文件格式不正确',
               variant: 'destructive',
             });
           }
@@ -77,118 +76,116 @@ export default function Admin() {
   };
 
   const tabs = [
-    { id: 'profile', label: 'Basic Info', icon: User },
-    { id: 'skills', label: 'Expertise', icon: Wrench },
-    { id: 'projects', label: 'Projects', icon: FolderOpen },
-    { id: 'education', label: 'Education', icon: GraduationCap },
-    { id: 'comments', label: 'Comments', icon: MessageSquare },
-    { id: 'resume', label: 'Resume AI', icon: FileText },
-    { id: 'database', label: 'Migration', icon: Database },
+    { id: 'profile', label: '基础信息', icon: User },
+    { id: 'skills', label: '技能管理', icon: Wrench },
+    { id: 'projects', label: '项目经历', icon: FolderOpen },
+    { id: 'education', label: '教育背景', icon: GraduationCap },
+    { id: 'comments', label: '留言管理', icon: MessageSquare },
+    { id: 'resume', label: '简历生成', icon: FileText },
+    { id: 'database', label: '数据库迁移', icon: Database },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50/50 flex flex-col md:flex-row">
-      {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 lg:w-72 bg-white border-r border-slate-200 flex flex-col sticky top-0 h-auto md:h-screen z-20">
-        <div className="p-8 border-b border-slate-50">
-          <Link 
-            to="/" 
-            className="text-2xl font-black tracking-tighter text-slate-900 flex items-center gap-2"
-          >
-            Portfolio<span className="text-primary">.</span>
-          </Link>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2">Admin Dashboard</p>
-        </div>
-
-        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200",
-                  isActive 
-                    ? "bg-slate-900 text-white shadow-lg shadow-slate-200" 
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-                )}
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 glass border-b border-border/50">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <Link to="/">
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              </Link>
+              <h1 className="text-xl font-bold text-foreground">管理后台</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleImport}
+                className="gap-2 border-border"
               >
-                <Icon className={cn("h-4 w-4", isActive ? "text-white" : "text-slate-400")} />
-                {tab.label}
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-slate-50 space-y-2">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleExport}
-            className="w-full justify-start gap-3 text-slate-500 hover:text-primary font-bold rounded-xl"
-          >
-            <Download className="h-4 w-4" />
-            Export Data
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleLogout}
-            className="w-full justify-start gap-3 text-slate-500 hover:text-destructive font-bold rounded-xl"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </Button>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-8 sticky top-0 z-10">
-          <div className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-900 rounded-full">
-                <ArrowLeft className="h-5 w-5" />
+                <Upload className="h-4 w-4" />
+                <span className="hidden sm:inline">导入</span>
               </Button>
-            </Link>
-            <h2 className="text-lg font-black tracking-tight text-slate-900">
-              {tabs.find(t => t.id === activeTab)?.label}
-            </h2>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleExport}
+                className="gap-2 border-primary/50 text-primary hover:bg-primary/10"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">导出</span>
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleLogout}
+                className="gap-2 text-muted-foreground hover:text-destructive"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">登出</span>
+              </Button>
+            </div>
           </div>
+        </div>
+      </header>
 
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleImport}
-              className="border-slate-200 text-slate-600 font-bold rounded-full px-6 h-10 hover:bg-slate-50"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Import
-            </Button>
-          </div>
-        </header>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 md:px-6 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2 h-auto bg-transparent p-0 mb-8">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <TabsTrigger
+                    key={tab.id}
+                    value={tab.id}
+                    className="flex items-center gap-2 px-4 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground bg-secondary/50 border border-border/50 rounded-lg"
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
 
-        <main className="flex-1 p-8 md:p-12 overflow-y-auto">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-5xl"
-          >
-            {activeTab === 'profile' && <ProfileForm />}
-            {activeTab === 'skills' && <SkillForm />}
-            {activeTab === 'projects' && <ProjectForm />}
-            {activeTab === 'education' && <EducationForm />}
-            {activeTab === 'comments' && <CommentManager />}
-            {activeTab === 'resume' && <ResumeGenerator />}
-            {activeTab === 'database' && <DataMigration />}
-          </motion.div>
-        </main>
-      </div>
+            <TabsContent value="profile">
+              <ProfileForm />
+            </TabsContent>
+
+            <TabsContent value="skills">
+              <SkillForm />
+            </TabsContent>
+
+            <TabsContent value="projects">
+              <ProjectForm />
+            </TabsContent>
+
+            <TabsContent value="education">
+              <EducationForm />
+            </TabsContent>
+
+            <TabsContent value="comments">
+              <CommentManager />
+            </TabsContent>
+
+            <TabsContent value="resume">
+              <ResumeGenerator />
+            </TabsContent>
+
+            <TabsContent value="database">
+              <DataMigration />
+            </TabsContent>
+          </Tabs>
+        </motion.div>
+      </main>
     </div>
   );
 }

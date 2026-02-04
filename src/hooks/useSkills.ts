@@ -32,23 +32,37 @@ export function useSkills() {
   const add = useCallback(async (name: string, weight: number = 50, category?: string) => {
     setIsLoading(true);
     try {
-      const newSkill: Skill = {
-        id: generateId(),
-        name,
-        weight,
-        category,
-      };
-      
-      // Local
-      addSkill(newSkill);
-      setSkills(prev => [...prev, newSkill]);
-
-      // Remote
       if (await isDatabaseAvailable()) {
-        await database.createSkill(newSkill);
+        // Database First
+        const skillData = {
+          name,
+          weight,
+          category,
+        };
+        const createdSkill = await database.createSkill(skillData);
+        
+        if (createdSkill) {
+          setSkills(prev => {
+            const newList = [...prev, createdSkill];
+            saveSkills(newList); // Sync to local
+            return newList;
+          });
+          toast({ title: "添加成功" });
+        } else {
+          throw new Error('Database creation failed');
+        }
+      } else {
+        // Fallback to local
+        const newSkill: Skill = {
+          id: generateId(),
+          name,
+          weight,
+          category,
+        };
+        addSkill(newSkill);
+        setSkills(prev => [...prev, newSkill]);
+        toast({ title: "添加成功 (本地模式)" });
       }
-      
-      toast({ title: "添加成功" });
     } catch (error) {
       console.error('Failed to add skill:', error);
       toast({ title: "添加失败", variant: "destructive" });
@@ -60,13 +74,17 @@ export function useSkills() {
   const update = useCallback(async (skill: Skill) => {
     setIsLoading(true);
     try {
-      // Local
-      updateSkill(skill);
-      setSkills(prev => prev.map(s => s.id === skill.id ? skill : s));
-
-      // Remote
       if (await isDatabaseAvailable()) {
         await database.updateSkill(skill.id, skill);
+        // Refresh or Optimistic update
+        setSkills(prev => {
+           const newList = prev.map(s => s.id === skill.id ? skill : s);
+           saveSkills(newList);
+           return newList;
+        });
+      } else {
+        updateSkill(skill);
+        setSkills(prev => prev.map(s => s.id === skill.id ? skill : s));
       }
       
       toast({ title: "更新成功" });
@@ -81,13 +99,16 @@ export function useSkills() {
   const remove = useCallback(async (id: string) => {
     setIsLoading(true);
     try {
-      // Local
-      deleteSkill(id);
-      setSkills(prev => prev.filter(s => s.id !== id));
-
-      // Remote
       if (await isDatabaseAvailable()) {
         await database.deleteSkill(id);
+        setSkills(prev => {
+          const newList = prev.filter(s => s.id !== id);
+          saveSkills(newList);
+          return newList;
+        });
+      } else {
+        deleteSkill(id);
+        setSkills(prev => prev.filter(s => s.id !== id));
       }
       
       toast({ title: "删除成功" });

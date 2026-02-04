@@ -34,19 +34,30 @@ export function useProfile() {
   const updateProfile = useCallback(async (newProfile: Profile) => {
     setIsLoading(true);
     try {
-      // Optimistic update
-      saveProfile(newProfile);
-      setProfile(newProfile);
-
       if (await isDatabaseAvailable()) {
         const exists = await database.getProfile();
         if (exists) {
+          // Update existing
           await database.updateProfile(exists.id, newProfile);
+          // Fetch updated profile to be sure
+          const updated = await database.getProfile();
+          if (updated) {
+            setProfile(updated);
+            saveProfile(updated);
+          }
         } else {
-          // 如果是第一次创建，排除ID让数据库生成
+          // Create new
           const { id, ...rest } = newProfile;
-          await database.createProfile(rest);
+          const created = await database.createProfile(rest);
+          if (created) {
+             setProfile(created);
+             saveProfile(created);
+          }
         }
+      } else {
+        // Fallback to local
+        saveProfile(newProfile);
+        setProfile(newProfile);
       }
       
       toast({ title: "保存成功", description: "个人信息已更新" });

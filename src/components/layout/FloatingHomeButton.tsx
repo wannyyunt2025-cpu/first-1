@@ -44,11 +44,11 @@ export function FloatingHomeButton() {
       <Button
         type="button"
         size="icon"
-        aria-label="Back to Home"
+        aria-label="返回首页"
         onClick={handleClick}
-        className="h-14 w-14 rounded-full bg-slate-900 text-white shadow-2xl shadow-slate-300 hover:scale-110 active:scale-95 transition-all duration-300 border-none"
+        className="shadow-lg"
       >
-        <Home className="h-6 w-6" />
+        <Home className="h-5 w-5" />
       </Button>
     </div>
   )

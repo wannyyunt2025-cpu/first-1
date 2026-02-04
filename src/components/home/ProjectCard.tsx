@@ -21,83 +21,73 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true }}
       transition={{ 
-        duration: 0.6, 
+        duration: 0.5, 
         delay: index * 0.1,
         ease: [0.16, 1, 0.3, 1],
       }}
-      className="h-full"
     >
-      <Card className="group h-full bg-white border border-slate-100 hover:border-primary/20 transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] overflow-hidden relative flex flex-col">
-        {/* Numbering */}
-        <div className="absolute top-6 right-8 text-4xl font-black text-slate-50 group-hover:text-primary/5 transition-colors pointer-events-none">
-          {String(index + 1).padStart(2, '0')}
-        </div>
-
-        <CardHeader className="pb-6 pt-10 px-8">
-          <div className="space-y-3">
-            <h3 className="text-3xl font-black text-slate-900 group-hover:text-primary transition-colors tracking-tighter leading-none">
-              {project.name}
-            </h3>
-            <div className="flex flex-wrap items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-400">
-              <span className="flex items-center gap-1.5">
-                {project.role}
-              </span>
-              <span className="w-1 h-1 rounded-full bg-slate-200" />
-              <span className="flex items-center gap-1.5">
-                {formatDateRange(project.startDate, project.endDate)}
-              </span>
+      <Card className="group h-full bg-card border-border/50 hover:border-primary/40 transition-all duration-300 hover:shadow-card-hover overflow-hidden">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1 flex-1">
+              <h3 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+                {project.name}
+              </h3>
+              <div className="flex flex-wrap items-center gap-3 text-base text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <User className="h-4 w-4" />
+                  {project.role}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  {formatDateRange(project.startDate, project.endDate)}
+                </span>
+              </div>
             </div>
           </div>
         </CardHeader>
 
-        <CardContent className="px-8 pb-10 space-y-8 flex-1 flex flex-col">
-          {/* Summary */}
-          <p className="text-slate-500 leading-relaxed text-sm flex-1">
-            {project.situation}
-          </p>
-
-          {/* Key Achievement */}
-          <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100/50 group-hover:bg-primary/[0.02] group-hover:border-primary/10 transition-colors duration-500">
-            <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-3">Key Impact</p>
-            <p className="text-slate-700 font-bold leading-snug">
+        <CardContent className="space-y-4">
+          {/* Key Result - Highlighted */}
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+            <p className="text-base font-medium text-primary mb-1">Key Result</p>
+            <p className="text-base text-foreground line-clamp-2">
               {project.result}
             </p>
           </div>
 
-          {/* Bottom Actions */}
-          <div className="pt-4 flex items-center justify-between">
-            <div className="flex -space-x-2">
-              {project.keywords.slice(0, 3).map((keyword, idx) => (
-                <div 
-                  key={idx}
-                  className="w-8 h-8 rounded-full bg-white border-2 border-slate-50 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-sm"
-                  title={keyword}
-                >
-                  {keyword.charAt(0)}
-                </div>
-              ))}
-              {project.keywords.length > 3 && (
-                <div className="w-8 h-8 rounded-full bg-slate-50 border-2 border-white flex items-center justify-center text-[8px] font-bold text-slate-400">
-                  +{project.keywords.length - 3}
-                </div>
-              )}
-            </div>
-
-            <Link to={`/project/${project.id}`}>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="group/btn gap-2 font-black uppercase tracking-widest text-[10px] text-slate-400 hover:text-primary hover:bg-transparent px-0"
+          {/* Keywords */}
+          <div className="flex flex-wrap gap-2">
+            {project.keywords.slice(0, 4).map((keyword, idx) => (
+              <Badge 
+                key={idx} 
+                variant="secondary"
+                className="text-sm bg-secondary/50 text-secondary-foreground hover:bg-secondary/70"
               >
-                Case Study
-                <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
-              </Button>
-            </Link>
+                {keyword}
+              </Badge>
+            ))}
+            {project.keywords.length > 4 && (
+              <Badge variant="outline" className="text-sm text-muted-foreground">
+                +{project.keywords.length - 4}
+              </Badge>
+            )}
           </div>
+
+          {/* View Detail Button */}
+          <Link to={`/project/${project.id}`}>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-between group/btn hover:bg-primary/10 text-muted-foreground hover:text-primary"
+            >
+              查看详情
+              <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     </motion.div>

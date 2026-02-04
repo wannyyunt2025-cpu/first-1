@@ -7,10 +7,10 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 
 const navLinks = [
-  { href: '/#about', label: 'About' },
-  { href: '/#skills', label: 'Expertise' },
-  { href: '/#projects', label: 'Projects' },
-  { href: '/#comments', label: 'Contact' },
+  { href: '/#about', label: '关于我' },
+  { href: '/#skills', label: '技能' },
+  { href: '/#projects', label: '项目' },
+  { href: '/#comments', label: '留言' },
 ];
 
 export function Navbar() {
@@ -52,61 +52,63 @@ export function Navbar() {
       animate={{ y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled
-          ? 'bg-white/80 backdrop-blur-md border-b border-slate-200/60 shadow-sm'
+          ? 'glass border-b border-border/50 shadow-md'
           : 'bg-transparent'
       )}
     >
       <div className="container mx-auto px-4 md:px-6">
-        <nav className="flex items-center justify-between h-20">
+        <nav className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link 
             to="/" 
-            className="text-2xl font-bold tracking-tighter text-slate-900 hover:opacity-80 transition-opacity focus-visible:outline-none"
+            className="text-xl font-bold text-gradient-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
           >
-            Portfolio<span className="text-primary">.</span>
+            Portfolio
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <button
                 key={link.href}
                 onClick={() => handleNavClick(link.href)}
                 className={cn(
-                  'text-sm font-semibold tracking-wide transition-all duration-300',
-                  'text-slate-600 hover:text-primary relative group'
+                  'inline-flex min-h-11 items-center px-4 rounded-lg transition-all duration-200 text-base font-medium',
+                  'text-muted-foreground hover:text-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
                 )}
               >
                 {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
               </button>
             ))}
           </div>
 
           {/* Desktop CTA Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2">
             {isAuthenticated ? (
               <>
                 <Link to="/admin">
-                  <Button variant="ghost" size="sm" className="font-bold text-slate-700 hover:text-primary hover:bg-slate-100 rounded-full px-6">
-                    Dashboard
+                  <Button variant="outline" size="sm" className="gap-2 border-primary/50 text-primary hover:bg-primary/10">
+                    <Settings className="h-4 w-4" />
+                    管理后台
                   </Button>
                 </Link>
                 <Button 
-                  variant="outline" 
+                  variant="ghost" 
                   size="sm" 
                   onClick={handleLogout}
-                  className="font-bold border-slate-200 text-slate-600 hover:bg-slate-50 rounded-full px-6"
+                  className="gap-2 text-muted-foreground hover:text-destructive"
                 >
-                  Logout
+                  <LogOut className="h-4 w-4" />
+                  登出
                 </Button>
               </>
             ) : (
               <Link to="/login">
-                <Button variant="default" size="sm" className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-full px-8 h-11 transition-all hover:scale-105 active:scale-95">
-                  Sign In
+                <Button variant="outline" size="sm" className="gap-2 border-primary/50 text-primary hover:bg-primary/10">
+                  <LogIn className="h-4 w-4" />
+                  管理员入口
                 </Button>
               </Link>
             )}
@@ -118,7 +120,7 @@ export function Navbar() {
             variant="ghost"
             size="icon"
             className="md:hidden"
-            aria-label={isMobileMenuOpen ? 'Close Menu' : 'Open Menu'}
+            aria-label={isMobileMenuOpen ? '关闭菜单' : '打开菜单'}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
@@ -153,7 +155,7 @@ export function Navbar() {
                     <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>
                       <Button variant="outline" size="sm" className="w-full justify-start gap-2 border-primary/50 text-primary">
                         <Settings className="h-4 w-4" />
-                        Admin Dashboard
+                        管理后台
                       </Button>
                     </Link>
                     <Button 
@@ -163,14 +165,14 @@ export function Navbar() {
                       className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
                     >
                       <LogOut className="h-4 w-4" />
-                      Sign Out
+                      登出
                     </Button>
                   </>
                 ) : (
                   <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button variant="outline" size="sm" className="w-full justify-start gap-2 border-primary/50 text-primary">
                       <LogIn className="h-4 w-4" />
-                      Admin Login
+                      管理员入口
                     </Button>
                   </Link>
                 )}

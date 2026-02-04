@@ -47,23 +47,38 @@ export function useProjects() {
   const add = useCallback(async (project: Omit<Project, 'id' | 'sortOrder'>) => {
     setIsLoading(true);
     try {
-      const newProject: Project = {
-        ...project,
-        id: generateId(),
-        sortOrder: projects.length + 1,
-      };
-      
-      // Local
-      addProject(newProject);
-      setProjects(prev => [...prev, newProject]);
-
-      // Remote
       if (await isDatabaseAvailable()) {
-        await database.createProject(newProject);
+        // Database First
+        const projectData = {
+          ...project,
+          sortOrder: projects.length + 1,
+        };
+        const createdProject = await database.createProject(projectData);
+        
+        if (createdProject) {
+          setProjects(prev => {
+            const newList = [...prev, createdProject];
+            saveProjects(newList); // Sync to local
+            return newList;
+          });
+          toast({ title: "项目添加成功" });
+          return createdProject;
+        } else {
+           throw new Error('Database creation failed');
+        }
+      } else {
+        // Fallback to local
+        const newProject: Project = {
+          ...project,
+          id: generateId(),
+          sortOrder: projects.length + 1,
+        };
+        
+        addProject(newProject);
+        setProjects(prev => [...prev, newProject]);
+        toast({ title: "项目添加成功 (本地模式)" });
+        return newProject;
       }
-      
-      toast({ title: "项目添加成功" });
-      return newProject;
     } catch (error) {
       console.error('Failed to add project:', error);
       toast({ title: "添加失败", variant: "destructive" });
@@ -76,13 +91,16 @@ export function useProjects() {
   const update = useCallback(async (project: Project) => {
     setIsLoading(true);
     try {
-      // Local
-      updateProject(project);
-      setProjects(prev => prev.map(p => p.id === project.id ? project : p));
-
-      // Remote
       if (await isDatabaseAvailable()) {
         await database.updateProject(project.id, project);
+        setProjects(prev => {
+          const newList = prev.map(p => p.id === project.id ? project : p);
+          saveProjects(newList);
+          return newList;
+        });
+      } else {
+        updateProject(project);
+        setProjects(prev => prev.map(p => p.id === project.id ? project : p));
       }
       
       toast({ title: "项目更新成功" });
@@ -97,13 +115,16 @@ export function useProjects() {
   const remove = useCallback(async (id: string) => {
     setIsLoading(true);
     try {
-      // Local
-      deleteProject(id);
-      setProjects(prev => prev.filter(p => p.id !== id));
-
-      // Remote
       if (await isDatabaseAvailable()) {
         await database.deleteProject(id);
+        setProjects(prev => {
+          const newList = prev.filter(p => p.id !== id);
+          saveProjects(newList);
+          return newList;
+        });
+      } else {
+        deleteProject(id);
+        setProjects(prev => prev.filter(p => p.id !== id));
       }
       
       toast({ title: "项目删除成功" });

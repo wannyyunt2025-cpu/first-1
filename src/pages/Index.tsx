@@ -9,19 +9,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main id="main-content">
-        <section aria-labelledby="hero-heading">
-          <HeroSection />
-        </section>
-        <section aria-labelledby="skills-heading">
-          <SkillCloud />
-        </section>
-        <section aria-labelledby="projects-heading">
-          <ProjectList />
-        </section>
-        <section aria-labelledby="comments-heading">
-          <CommentSection />
-        </section>
+      <main>
+        <HeroSection />
+        <SkillCloud />
+        <ProjectList />
+        <CommentSection />
       </main>
       <Footer />
     </div>
