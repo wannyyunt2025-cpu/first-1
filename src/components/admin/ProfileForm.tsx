@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
 import { Profile } from '@/types';
-import { useTheme } from '@/hooks/useTheme';
 
 const profileSchema = z.object({
   name: z.string().min(1, '请输入姓名'),
@@ -30,10 +29,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export function ProfileForm() {
   const { profile, updateProfile, isLoading } = useProfile();
-  const { style } = useTheme();
   const { toast } = useToast();
-
-  const isMinimalist = style === 'minimalist';
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -71,42 +67,36 @@ export function ProfileForm() {
     };
     updateProfile(newProfile);
     toast({
-      title: isMinimalist ? 'Settings Saved' : '保存成功',
-      description: isMinimalist ? 'Profile information updated.' : '基础信息已更新',
+      title: '保存成功',
+      description: '基础信息已更新',
     });
   };
 
   const visibilityOptions = [
-    { value: 'public', label: isMinimalist ? 'Public' : '公开' },
-    { value: 'semi', label: isMinimalist ? 'Click to show' : '半公开（点击显示）' },
-    { value: 'private', label: isMinimalist ? 'Private' : '私密' },
+    { value: 'public', label: '公开' },
+    { value: 'semi', label: '半公开（点击显示）' },
+    { value: 'private', label: '私密' },
   ];
 
   return (
-    <Card className={`border-none shadow-sm ${isMinimalist ? 'bg-white' : 'bg-card'}`}>
-      <CardHeader className="pb-8">
-        <CardTitle className={`font-black tracking-tight ${isMinimalist ? 'text-2xl text-slate-900' : ''}`}>
-          {isMinimalist ? 'Basic Information' : '基础信息'}
-        </CardTitle>
-        <CardDescription className={isMinimalist ? 'text-slate-500 font-medium' : ''}>
-          {isMinimalist ? 'Manage your personal details and contact methods.' : '管理您的个人信息和联系方式'}
-        </CardDescription>
+    <Card className="bg-card border-border/50">
+      <CardHeader>
+        <CardTitle>基础信息</CardTitle>
+        <CardDescription>管理您的个人信息和联系方式</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className={isMinimalist ? "text-[10px] font-black uppercase tracking-widest text-slate-400" : ""}>
-                      {isMinimalist ? 'Name' : '姓名'}
-                    </FormLabel>
+                    <FormLabel>姓名</FormLabel>
                     <FormControl>
-                      <Input {...field} className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`} />
+                      <Input {...field} className="bg-secondary/50" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -118,11 +108,9 @@ export function ProfileForm() {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className={isMinimalist ? "text-[10px] font-black uppercase tracking-widest text-slate-400" : ""}>
-                      {isMinimalist ? 'Professional Title' : '职业定位'}
-                    </FormLabel>
+                    <FormLabel>职业定位</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={isMinimalist ? "e.g. Fullstack Developer" : "如：全栈开发工程师"} className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`} />
+                      <Input {...field} placeholder="如：全栈开发工程师" className="bg-secondary/50" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -135,14 +123,12 @@ export function ProfileForm() {
               name="slogan"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className={isMinimalist ? "text-[10px] font-black uppercase tracking-widest text-slate-400" : ""}>
-                    {isMinimalist ? 'Headline / Slogan' : '一句话介绍'}
-                  </FormLabel>
+                  <FormLabel>一句话介绍</FormLabel>
                   <FormControl>
                     <Textarea 
                       {...field} 
-                      placeholder={isMinimalist ? "Describe your value proposition..." : "用一句话描述您的核心价值主张"}
-                      className={`min-h-[100px] rounded-2xl focus:ring-primary/20 transition-all resize-none ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                      placeholder="用一句话描述您的核心价值主张"
+                      className="bg-secondary/50 resize-none"
                       rows={2}
                     />
                   </FormControl>
@@ -156,37 +142,32 @@ export function ProfileForm() {
               name="avatar"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className={isMinimalist ? "text-[10px] font-black uppercase tracking-widest text-slate-400" : ""}>
-                    {isMinimalist ? 'Avatar URL (Optional)' : '头像URL（选填）'}
-                  </FormLabel>
+                  <FormLabel>头像URL（选填）</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="https://..." className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`} />
+                    <Input {...field} placeholder="https://..." className="bg-secondary/50" />
                   </FormControl>
+                  <FormDescription>输入头像图片的URL地址</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
             {/* Contact Info */}
-            <div className={`pt-8 border-t ${isMinimalist ? 'border-slate-50' : 'border-border'}`}>
-              <h3 className={`font-black tracking-tight mb-6 ${isMinimalist ? 'text-lg text-slate-900' : 'text-lg font-semibold'}`}>
-                {isMinimalist ? 'Contact Details' : '联系方式'}
-              </h3>
+            <div className="pt-4 border-t border-border">
+              <h3 className="text-lg font-semibold mb-4">联系方式</h3>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Email */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                   <div className="md:col-span-2">
                     <FormField
                       control={form.control}
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className={isMinimalist ? "text-[10px] font-black uppercase tracking-widest text-slate-400" : ""}>
-                            {isMinimalist ? 'Email' : '邮箱'}
-                          </FormLabel>
+                          <FormLabel>邮箱</FormLabel>
                           <FormControl>
-                            <Input {...field} type="email" className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`} />
+                            <Input {...field} type="email" className="bg-secondary/50" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -198,16 +179,14 @@ export function ProfileForm() {
                     name="emailVisibility"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className={isMinimalist ? "text-[10px] font-black uppercase tracking-widest text-slate-400" : ""}>
-                          {isMinimalist ? 'Visibility' : '可见性'}
-                        </FormLabel>
+                        <FormLabel>可见性</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}>
+                            <SelectTrigger className="bg-secondary/50">
                               <SelectValue />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className={isMinimalist ? "rounded-xl border-slate-100" : ""}>
+                          <SelectContent>
                             {visibilityOptions.map((opt) => (
                               <SelectItem key={opt.value} value={opt.value}>
                                 {opt.label}
@@ -222,18 +201,16 @@ export function ProfileForm() {
                 </div>
 
                 {/* WeChat */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                   <div className="md:col-span-2">
                     <FormField
                       control={form.control}
                       name="wechat"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className={isMinimalist ? "text-[10px] font-black uppercase tracking-widest text-slate-400" : ""}>
-                            {isMinimalist ? 'WeChat ID' : '微信号'}
-                          </FormLabel>
+                          <FormLabel>微信号</FormLabel>
                           <FormControl>
-                            <Input {...field} className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`} />
+                            <Input {...field} className="bg-secondary/50" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -245,16 +222,57 @@ export function ProfileForm() {
                     name="wechatVisibility"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className={isMinimalist ? "text-[10px] font-black uppercase tracking-widest text-slate-400" : ""}>
-                          {isMinimalist ? 'Visibility' : '可见性'}
-                        </FormLabel>
+                        <FormLabel>可见性</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}>
+                            <SelectTrigger className="bg-secondary/50">
                               <SelectValue />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className={isMinimalist ? "rounded-xl border-slate-100" : ""}>
+                          <SelectContent>
+                            {visibilityOptions.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Phone */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                  <div className="md:col-span-2">
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>手机号（选填）</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-secondary/50" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="phoneVisibility"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>可见性</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-secondary/50">
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
                             {visibilityOptions.map((opt) => (
                               <SelectItem key={opt.value} value={opt.value}>
                                 {opt.label}
@@ -270,16 +288,14 @@ export function ProfileForm() {
               </div>
             </div>
 
-            <div className="flex justify-end pt-8 border-t border-slate-50">
+            <div className="flex justify-end pt-4">
               <Button 
                 type="submit" 
                 disabled={isLoading}
-                className={`h-14 px-10 rounded-full font-bold shadow-xl transition-all active:scale-[0.98] ${
-                  isMinimalist ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-slate-200' : 'bg-gradient-primary hover:opacity-90 gap-2'
-                }`}
+                className="bg-gradient-primary hover:opacity-90 gap-2"
               >
-                {!isMinimalist && <Save className="h-4 w-4" />}
-                {isMinimalist ? 'Save Changes' : '保存更改'}
+                <Save className="h-4 w-4" />
+                保存更改
               </Button>
             </div>
           </form>

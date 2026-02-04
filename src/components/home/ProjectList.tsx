@@ -1,49 +1,105 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { ChevronDown, ArrowDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useProjects } from '@/hooks/useProjects';
-import { useTheme } from '@/hooks/useTheme';
 import { ProjectCard } from './ProjectCard';
 
 export function ProjectList() {
   const { publicProjects } = useProjects();
-  const { style } = useTheme();
-  const isMinimalist = style === 'minimalist';
+  const [showAll, setShowAll] = useState(false);
+  
+  const displayedProjects = showAll ? publicProjects : publicProjects.slice(0, 3);
+  const hasMore = publicProjects.length > 3;
+
+  const scrollToComments = () => {
+    const element = document.getElementById('comments');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
-    <section id="projects" className={`py-24 transition-colors duration-700 ${isMinimalist ? 'bg-white' : 'bg-background'}`}>
+    <section id="projects" className="pt-12 pb-20 md:pt-16 md:pb-32 bg-secondary/20">
       <div className="container mx-auto px-4 md:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className={`mb-16 ${isMinimalist ? 'text-left' : 'text-center'}`}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
         >
-          <h2 id="projects-heading" className={`font-black tracking-tighter ${
-            isMinimalist ? 'text-sm uppercase tracking-[0.2em] text-primary mb-6' : 'text-3xl md:text-headline-lg text-foreground mb-4'
-          }`}>
-            {isMinimalist ? 'Portfolio' : '项目经历'}
+          <h2 id="projects-heading" className="text-3xl md:text-headline-lg font-bold text-foreground mb-4">
+            项目经历
           </h2>
-          <h3 className={`font-black tracking-tighter leading-tight ${
-            isMinimalist ? 'text-4xl md:text-5xl text-slate-900' : 'hidden'
-          }`}>
-            Selected works.
-          </h3>
-          {!isMinimalist && (
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              展示我近期参与的核心项目，涵盖 Web 开发、移动端及 AI 领域
-            </p>
-          )}
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            精选项目案例，展示我的技术实践与解决问题的能力
+          </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {publicProjects.map((project, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {displayedProjects.map((project, index) => (
             <ProjectCard 
               key={project.id} 
               project={project} 
-              index={index} 
+              index={index}
             />
           ))}
         </div>
+
+        {hasMore && !showAll && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="flex justify-center mt-10"
+          >
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setShowAll(true)}
+              className="gap-2 border-primary/50 text-primary hover:bg-primary/10"
+            >
+              查看更多项目
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </motion.div>
+        )}
+
+        {showAll && hasMore && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex justify-center mt-10"
+          >
+            <Button
+              variant="ghost"
+              onClick={() => setShowAll(false)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              收起
+            </Button>
+          </motion.div>
+        )}
+
+        {/* Scroll to comments indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="mt-16 md:mt-20"
+        >
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary cursor-pointer transition-colors"
+            onClick={scrollToComments}
+          >
+            <span className="text-sm font-medium">查看留言互动</span>
+            <ArrowDown className="h-5 w-5" />
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

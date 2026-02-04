@@ -11,7 +11,6 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useProjects } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
-import { useTheme } from '@/hooks/useTheme';
 import { Project } from '@/types';
 import { generateId } from '@/lib/storage';
 
@@ -32,13 +31,10 @@ const emptyProject: Omit<Project, 'id' | 'sortOrder'> = {
 export function ProjectForm() {
   const { projects, add, update, remove } = useProjects();
   const { toast } = useToast();
-  const { style } = useTheme();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [formData, setFormData] = useState<Omit<Project, 'id' | 'sortOrder'>>(emptyProject);
   const [keywordInput, setKeywordInput] = useState('');
-
-  const isMinimalist = style === 'minimalist';
 
   const openCreateDialog = () => {
     setEditingProject(null);
@@ -127,24 +123,15 @@ export function ProjectForm() {
 
   return (
     <>
-      <Card className={`border-none shadow-sm ${isMinimalist ? 'bg-white' : 'bg-card'}`}>
-        <CardHeader className="flex flex-row items-center justify-between pb-8">
+      <Card className="bg-card border-border/50">
+        <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className={`font-black tracking-tight ${isMinimalist ? 'text-2xl text-slate-900' : ''}`}>
-              {isMinimalist ? 'Project Showcase' : '项目经历'}
-            </CardTitle>
-            <CardDescription className={isMinimalist ? 'text-slate-500 font-medium' : ''}>
-              {isMinimalist ? 'Showcase your best work using the STAR method.' : '管理您的项目经历，使用STAR法则描述'}
-            </CardDescription>
+            <CardTitle>项目经历</CardTitle>
+            <CardDescription>管理您的项目经历，使用STAR法则描述</CardDescription>
           </div>
-          <Button 
-            onClick={openCreateDialog} 
-            className={`h-11 px-6 rounded-xl font-bold shadow-lg active:scale-[0.98] transition-all ${
-              isMinimalist ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-gradient-primary hover:opacity-90'
-            }`}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {isMinimalist ? 'Add Project' : '添加项目'}
+          <Button onClick={openCreateDialog} className="bg-gradient-primary hover:opacity-90 gap-2">
+            <Plus className="h-4 w-4" />
+            添加项目
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -152,49 +139,39 @@ export function ProjectForm() {
             {projects.map((project, index) => (
               <motion.div
                 key={project.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ delay: index * 0.05 }}
-                className={`group p-5 rounded-2xl border transition-all duration-300 ${
-                  isMinimalist 
-                    ? 'bg-white border-slate-100 hover:border-primary/20 hover:shadow-md' 
-                    : 'bg-secondary/30 border-border/30 hover:border-primary/30'
-                }`}
+                className="group p-4 rounded-lg bg-secondary/30 border border-border/30 hover:border-primary/30 transition-colors"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className={`font-bold tracking-tight truncate ${isMinimalist ? 'text-slate-900' : 'text-foreground'}`}>
+                      <h4 className="font-semibold text-foreground truncate">
                         {project.name}
                       </h4>
                       {!project.isPublic && (
-                        <Badge variant="outline" className={`text-[10px] font-black uppercase tracking-widest ${isMinimalist ? 'border-slate-200 text-slate-400' : 'text-muted-foreground'}`}>
-                          {isMinimalist ? 'Private' : '私密'}
+                        <Badge variant="outline" className="text-xs text-muted-foreground">
+                          私密
                         </Badge>
                       )}
                     </div>
-                    <p className={`text-sm font-medium mb-3 ${isMinimalist ? 'text-primary' : 'text-muted-foreground'}`}>
+                    <p className="text-sm text-muted-foreground mb-2">
                       {project.role} | {project.startDate} - {project.endDate}
                     </p>
-                    <p className={`text-sm line-clamp-2 leading-relaxed ${isMinimalist ? 'text-slate-600' : 'text-foreground/80'}`}>
+                    <p className="text-sm text-foreground/80 line-clamp-2">
                       {project.result}
                     </p>
                     {project.keywords.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-4">
+                      <div className="flex flex-wrap gap-1 mt-2">
                         {project.keywords.slice(0, 5).map((keyword, idx) => (
-                          <Badge 
-                            key={idx} 
-                            variant="secondary" 
-                            className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 ${
-                              isMinimalist ? 'bg-slate-50 text-slate-500 border-none' : 'text-xs'
-                            }`}
-                          >
+                          <Badge key={idx} variant="secondary" className="text-xs">
                             {keyword}
                           </Badge>
                         ))}
                         {project.keywords.length > 5 && (
-                          <Badge variant="outline" className="text-[10px] font-black">
+                          <Badge variant="outline" className="text-xs">
                             +{project.keywords.length - 5}
                           </Badge>
                         )}
@@ -202,12 +179,12 @@ export function ProjectForm() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => toggleVisibility(project)}
-                      className="text-slate-300 hover:text-slate-900 hover:bg-transparent transition-colors"
+                      className="text-muted-foreground hover:text-foreground"
                     >
                       {project.isPublic ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </Button>
@@ -215,7 +192,7 @@ export function ProjectForm() {
                       variant="ghost"
                       size="icon"
                       onClick={() => openEditDialog(project)}
-                      className="text-slate-300 hover:text-primary hover:bg-transparent transition-colors"
+                      className="text-muted-foreground hover:text-primary"
                     >
                       <Edit2 className="h-4 w-4" />
                     </Button>
@@ -223,7 +200,7 @@ export function ProjectForm() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(project)}
-                      className="text-slate-300 hover:text-destructive hover:bg-transparent transition-colors"
+                      className="text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -234,12 +211,8 @@ export function ProjectForm() {
           </AnimatePresence>
 
           {projects.length === 0 && (
-            <div className={`text-center py-12 border-2 border-dashed rounded-3xl ${
-              isMinimalist ? 'border-slate-100 bg-slate-50/30' : 'border-border/50 bg-card/20'
-            }`}>
-              <p className="font-bold text-slate-400">
-                {isMinimalist ? 'No projects added yet. Start by adding one.' : '还没有添加项目，点击上方按钮添加'}
-              </p>
+            <div className="text-center py-8 text-muted-foreground">
+              还没有添加项目，点击上方按钮添加
             </div>
           )}
         </CardContent>
@@ -247,157 +220,124 @@ export function ProjectForm() {
 
       {/* Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className={`max-w-2xl max-h-[90vh] overflow-y-auto border-none ${isMinimalist ? 'bg-white rounded-3xl shadow-2xl' : 'bg-card'}`}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card">
           <DialogHeader>
-            <DialogTitle className={`text-xl font-black tracking-tight ${isMinimalist ? 'text-slate-900' : ''}`}>
-              {editingProject 
-                ? (isMinimalist ? 'Edit Project' : '编辑项目') 
-                : (isMinimalist ? 'Add Project' : '添加项目')}
+            <DialogTitle>
+              {editingProject ? '编辑项目' : '添加项目'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6 py-6">
+          <div className="space-y-4 py-4">
             {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'Project Name *' : '项目名称 *'}
-                </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>项目名称 *</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder={isMinimalist ? "Project Title" : "项目名称"}
-                  className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                  placeholder="项目名称"
+                  className="bg-secondary/50 mt-1"
                 />
               </div>
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'Role *' : '角色 *'}
-                </Label>
+              <div>
+                <Label>角色 *</Label>
                 <Input
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  placeholder={isMinimalist ? "e.g. Lead Developer" : "如：技术负责人"}
-                  className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                  placeholder="如：技术负责人"
+                  className="bg-secondary/50 mt-1"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'Start Date *' : '开始时间 *'}
-                </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>开始时间 *</Label>
                 <Input
                   type="month"
                   value={formData.startDate}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                  className="bg-secondary/50 mt-1"
                 />
               </div>
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'End Date *' : '结束时间 *'}
-                </Label>
+              <div>
+                <Label>结束时间 *</Label>
                 <Input
                   type="month"
                   value={formData.endDate}
                   onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                  className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                  className="bg-secondary/50 mt-1"
                 />
               </div>
             </div>
 
             {/* STAR */}
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'Situation' : '背景情境 (Situation)'}
-                </Label>
-                <Textarea
-                  value={formData.situation}
-                  onChange={(e) => setFormData({ ...formData, situation: e.target.value })}
-                  placeholder={isMinimalist ? "What was the context?" : "描述项目的背景和面临的问题..."}
-                  className={`rounded-xl focus:ring-primary/20 transition-all resize-none ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
-                  rows={3}
-                />
-              </div>
+            <div>
+              <Label>背景情境 (Situation)</Label>
+              <Textarea
+                value={formData.situation}
+                onChange={(e) => setFormData({ ...formData, situation: e.target.value })}
+                placeholder="描述项目的背景和面临的问题..."
+                className="bg-secondary/50 mt-1 resize-none"
+                rows={3}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'Task' : '任务目标 (Task)'}
-                </Label>
-                <Textarea
-                  value={formData.task}
-                  onChange={(e) => setFormData({ ...formData, task: e.target.value })}
-                  placeholder={isMinimalist ? "What were your objectives?" : "描述您需要完成的任务和目标..."}
-                  className={`rounded-xl focus:ring-primary/20 transition-all resize-none ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
-                  rows={3}
-                />
-              </div>
+            <div>
+              <Label>任务目标 (Task)</Label>
+              <Textarea
+                value={formData.task}
+                onChange={(e) => setFormData({ ...formData, task: e.target.value })}
+                placeholder="描述您需要完成的任务和目标..."
+                className="bg-secondary/50 mt-1 resize-none"
+                rows={3}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'Action' : '行动方案 (Action)'}
-                </Label>
-                <Textarea
-                  value={formData.action}
-                  onChange={(e) => setFormData({ ...formData, action: e.target.value })}
-                  placeholder={isMinimalist ? "How did you achieve it?" : "描述您采取的具体行动和方法..."}
-                  className={`rounded-xl focus:ring-primary/20 transition-all resize-none ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
-                  rows={3}
-                />
-              </div>
+            <div>
+              <Label>行动方案 (Action)</Label>
+              <Textarea
+                value={formData.action}
+                onChange={(e) => setFormData({ ...formData, action: e.target.value })}
+                placeholder="描述您采取的具体行动和方法..."
+                className="bg-secondary/50 mt-1 resize-none"
+                rows={3}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'Result' : '成果产出 (Result)'}
-                </Label>
-                <Textarea
-                  value={formData.result}
-                  onChange={(e) => setFormData({ ...formData, result: e.target.value })}
-                  placeholder={isMinimalist ? "What were the outcomes?" : "描述您取得的成果和数据..."}
-                  className={`rounded-xl focus:ring-primary/20 transition-all resize-none ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
-                  rows={3}
-                />
-              </div>
+            <div>
+              <Label>成果产出 (Result) - Key Result</Label>
+              <Textarea
+                value={formData.result}
+                onChange={(e) => setFormData({ ...formData, result: e.target.value })}
+                placeholder="描述您取得的成果和数据..."
+                className="bg-secondary/50 mt-1 resize-none"
+                rows={3}
+              />
             </div>
 
             {/* Keywords */}
-            <div className="space-y-2">
-              <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                {isMinimalist ? 'Keywords & Stack' : '关键词标签'}
-              </Label>
-              <div className="flex gap-2">
+            <div>
+              <Label>关键词标签</Label>
+              <div className="flex gap-2 mt-1">
                 <Input
                   value={keywordInput}
                   onChange={(e) => setKeywordInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddKeyword())}
-                  placeholder={isMinimalist ? "Add tags..." : "输入关键词按回车添加"}
-                  className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                  placeholder="输入关键词按回车添加"
+                  className="bg-secondary/50"
                 />
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={handleAddKeyword}
-                  className={`h-12 px-6 rounded-xl font-bold ${isMinimalist ? 'border-slate-200' : ''}`}
-                >
-                  {isMinimalist ? 'Add' : '添加'}
+                <Button type="button" variant="outline" onClick={handleAddKeyword}>
+                  添加
                 </Button>
               </div>
               {formData.keywords.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {formData.keywords.map((keyword, idx) => (
-                    <Badge 
-                      key={idx} 
-                      variant="secondary" 
-                      className={`gap-1.5 py-1.5 px-3 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                        isMinimalist ? 'bg-slate-50 text-slate-500 border-none' : ''
-                      }`}
-                    >
+                    <Badge key={idx} variant="secondary" className="gap-1">
                       {keyword}
                       <X
-                        className="h-3.5 w-3.5 cursor-pointer hover:text-destructive transition-colors"
+                        className="h-3 w-3 cursor-pointer hover:text-destructive"
                         onClick={() => handleRemoveKeyword(keyword)}
                       />
                     </Badge>
@@ -407,33 +347,22 @@ export function ProjectForm() {
             </div>
 
             {/* Visibility */}
-            <div className="flex items-center gap-3 pt-4">
+            <div className="flex items-center gap-2">
               <Switch
                 checked={formData.isPublic}
                 onCheckedChange={(checked) => setFormData({ ...formData, isPublic: checked })}
               />
-              <Label className={`font-bold ${isMinimalist ? 'text-slate-700' : ''}`}>
-                {isMinimalist ? 'Publicly Visible' : '公开展示'}
-              </Label>
+              <Label>公开展示</Label>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-6 border-t border-slate-50">
-            <Button 
-              variant="ghost" 
-              onClick={() => setIsDialogOpen(false)}
-              className={`font-bold rounded-xl ${isMinimalist ? 'text-slate-400 hover:text-slate-600' : ''}`}
-            >
-              {isMinimalist ? 'Cancel' : '取消'}
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              取消
             </Button>
-            <Button 
-              onClick={handleSave} 
-              className={`h-11 px-8 rounded-xl font-bold shadow-lg active:scale-[0.98] transition-all ${
-                isMinimalist ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-gradient-primary hover:opacity-90'
-              }`}
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {isMinimalist ? 'Save Project' : '保存'}
+            <Button onClick={handleSave} className="bg-gradient-primary hover:opacity-90 gap-2">
+              <Save className="h-4 w-4" />
+              保存
             </Button>
           </div>
         </DialogContent>

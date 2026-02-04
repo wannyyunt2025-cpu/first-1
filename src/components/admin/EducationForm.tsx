@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { useTheme } from '@/hooks/useTheme';
 import { Education } from '@/types';
 import { getEducation, saveEducation, generateId } from '@/lib/storage';
 import { database, isDatabaseAvailable } from '@/lib/database';
@@ -24,14 +23,11 @@ const emptyEducation: Omit<Education, 'id'> = {
 
 export function EducationForm() {
   const { toast } = useToast();
-  const { style } = useTheme();
   const [educationList, setEducationList] = useState<Education[]>(() => getEducation());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState<Education | null>(null);
   const [formData, setFormData] = useState<Omit<Education, 'id'>>(emptyEducation);
   const [isLoading, setIsLoading] = useState(false);
-
-  const isMinimalist = style === 'minimalist';
 
   useEffect(() => {
     const loadData = async () => {
@@ -181,24 +177,15 @@ export function EducationForm() {
 
   return (
     <>
-      <Card className={`border-none shadow-sm ${isMinimalist ? 'bg-white' : 'bg-card'}`}>
+      <Card className="bg-card border-border/50">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className={`font-black tracking-tight ${isMinimalist ? 'text-2xl text-slate-900' : ''}`}>
-              {isMinimalist ? 'Education Background' : '教育背景'}
-            </CardTitle>
-            <CardDescription className={isMinimalist ? 'text-slate-500 font-medium' : ''}>
-              {isMinimalist ? 'Manage your academic history and qualifications.' : '管理您的教育经历'}
-            </CardDescription>
+            <CardTitle>教育背景</CardTitle>
+            <CardDescription>管理您的教育经历</CardDescription>
           </div>
-          <Button 
-            onClick={openCreateDialog} 
-            className={`h-11 px-6 rounded-xl font-bold shadow-lg active:scale-[0.98] transition-all ${
-              isMinimalist ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-gradient-primary hover:opacity-90'
-            }`}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {isMinimalist ? 'Add' : '添加'}
+          <Button onClick={openCreateDialog} className="bg-gradient-primary hover:opacity-90 gap-2">
+            <Plus className="h-4 w-4" />
+            添加
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -206,29 +193,25 @@ export function EducationForm() {
             {educationList.map((edu, index) => (
               <motion.div
                 key={edu.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ delay: index * 0.05 }}
-                className={`group p-5 rounded-2xl border transition-all duration-300 ${
-                  isMinimalist 
-                    ? 'bg-white border-slate-100 hover:border-primary/20 hover:shadow-md' 
-                    : 'bg-secondary/30 border-border/30 hover:border-primary/30'
-                }`}
+                className="group p-4 rounded-lg bg-secondary/30 border border-border/30 hover:border-primary/30 transition-colors"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <h4 className={`font-bold tracking-tight ${isMinimalist ? 'text-slate-900' : 'text-foreground'}`}>
+                    <h4 className="font-semibold text-foreground">
                       {edu.school}
                     </h4>
-                    <p className={`text-sm font-medium ${isMinimalist ? 'text-primary' : 'text-muted-foreground'}`}>
+                    <p className="text-sm text-muted-foreground">
                       {edu.degree} - {edu.major}
                     </p>
-                    <p className={`text-xs mt-1 ${isMinimalist ? 'text-slate-400 font-bold uppercase tracking-wider' : 'text-muted-foreground'}`}>
+                    <p className="text-sm text-muted-foreground">
                       {edu.startDate} - {edu.endDate}
                     </p>
                     {edu.description && (
-                      <p className={`text-sm mt-3 leading-relaxed ${isMinimalist ? 'text-slate-600' : 'text-foreground/80'}`}>
+                      <p className="text-sm text-foreground/80 mt-2">
                         {edu.description}
                       </p>
                     )}
@@ -239,7 +222,7 @@ export function EducationForm() {
                       variant="ghost"
                       size="icon"
                       onClick={() => openEditDialog(edu)}
-                      className="text-slate-300 hover:text-primary hover:bg-transparent transition-colors"
+                      className="text-muted-foreground hover:text-primary"
                     >
                       <Edit2 className="h-4 w-4" />
                     </Button>
@@ -247,7 +230,7 @@ export function EducationForm() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(edu)}
-                      className="text-slate-300 hover:text-destructive hover:bg-transparent transition-colors"
+                      className="text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -258,12 +241,8 @@ export function EducationForm() {
           </AnimatePresence>
 
           {educationList.length === 0 && (
-            <div className={`text-center py-12 border-2 border-dashed rounded-3xl ${
-              isMinimalist ? 'border-slate-100 bg-slate-50/30' : 'border-border/50 bg-card/20'
-            }`}>
-              <p className="font-bold text-slate-400">
-                {isMinimalist ? 'No education history yet. Click the button to add.' : '还没有添加教育经历，点击上方按钮添加'}
-              </p>
+            <div className="text-center py-8 text-muted-foreground">
+              还没有添加教育经历，点击上方按钮添加
             </div>
           )}
         </CardContent>
@@ -271,108 +250,85 @@ export function EducationForm() {
 
       {/* Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className={`max-w-lg border-none ${isMinimalist ? 'bg-white rounded-3xl shadow-2xl' : 'bg-card'}`}>
+        <DialogContent className="max-w-lg bg-card">
           <DialogHeader>
-            <DialogTitle className={`text-xl font-black tracking-tight ${isMinimalist ? 'text-slate-900' : ''}`}>
-              {editingEducation 
-                ? (isMinimalist ? 'Edit Education' : '编辑教育经历') 
-                : (isMinimalist ? 'Add Education' : '添加教育经历')}
+            <DialogTitle>
+              {editingEducation ? '编辑教育经历' : '添加教育经历'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6 py-6">
-            <div className="space-y-2">
-              <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                {isMinimalist ? 'School Name *' : '学校 *'}
-              </Label>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>学校 *</Label>
               <Input
                 value={formData.school}
                 onChange={(e) => setFormData({ ...formData, school: e.target.value })}
-                placeholder={isMinimalist ? "e.g. Stanford University" : "学校名称"}
-                className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                placeholder="学校名称"
+                className="bg-secondary/50 mt-1"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'Degree *' : '学位 *'}
-                </Label>
+              <div>
+                <Label>学位 *</Label>
                 <Input
                   value={formData.degree}
                   onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-                  placeholder={isMinimalist ? "e.g. Bachelor" : "如：本科、硕士"}
-                  className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                  placeholder="如：本科、硕士"
+                  className="bg-secondary/50 mt-1"
                 />
               </div>
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'Major *' : '专业 *'}
-                </Label>
+              <div>
+                <Label>专业 *</Label>
                 <Input
                   value={formData.major}
                   onChange={(e) => setFormData({ ...formData, major: e.target.value })}
-                  placeholder={isMinimalist ? "e.g. Computer Science" : "专业名称"}
-                  className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                  placeholder="专业名称"
+                  className="bg-secondary/50 mt-1"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'Start Date' : '入学时间'}
-                </Label>
+              <div>
+                <Label>入学时间</Label>
                 <Input
                   type="month"
                   value={formData.startDate}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                  className="bg-secondary/50 mt-1"
                 />
               </div>
-              <div className="space-y-2">
-                <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                  {isMinimalist ? 'End Date' : '毕业时间'}
-                </Label>
+              <div>
+                <Label>毕业时间</Label>
                 <Input
                   type="month"
                   value={formData.endDate}
                   onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                  className={`h-12 rounded-xl focus:ring-primary/20 transition-all ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                  className="bg-secondary/50 mt-1"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label className={`text-xs font-black uppercase tracking-widest ${isMinimalist ? 'text-slate-400' : ''}`}>
-                {isMinimalist ? 'Description (Optional)' : '描述（选填）'}
-              </Label>
+            <div>
+              <Label>描述（选填）</Label>
               <Textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder={isMinimalist ? "Key achievements, GPA, etc." : "如：主修课程、GPA、获奖情况等"}
-                className={`rounded-xl focus:ring-primary/20 transition-all resize-none ${isMinimalist ? 'bg-slate-50 border-slate-100' : 'bg-secondary/50'}`}
+                placeholder="如：主修课程、GPA、获奖情况等"
+                className="bg-secondary/50 mt-1 resize-none"
                 rows={3}
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-6 border-t border-slate-50">
-            <Button 
-              variant="ghost" 
-              onClick={() => setIsDialogOpen(false)}
-              className={`font-bold rounded-xl ${isMinimalist ? 'text-slate-400 hover:text-slate-600' : ''}`}
-            >
-              {isMinimalist ? 'Cancel' : '取消'}
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              取消
             </Button>
-            <Button 
-              onClick={handleSave} 
-              className={`h-11 px-8 rounded-xl font-bold shadow-lg active:scale-[0.98] transition-all ${
-                isMinimalist ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-gradient-primary hover:opacity-90'
-              }`}
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {isMinimalist ? 'Save Changes' : '保存'}
+            <Button onClick={handleSave} className="bg-gradient-primary hover:opacity-90 gap-2">
+              <Save className="h-4 w-4" />
+              保存
             </Button>
           </div>
         </DialogContent>
