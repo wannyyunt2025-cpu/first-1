@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useProfile } from '@/hooks/useProfile';
 import { ContactModal } from './ContactModal';
 
 export function HeroSection() {
-  const { profile } = useProfile();
+  const { profile, isLoading } = useProfile();
   const [showContactModal, setShowContactModal] = useState(false);
 
   const scrollToProjects = () => {
@@ -15,6 +16,9 @@ export function HeroSection() {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  // Determine if we should show loading state (either isLoading is true OR profile data is empty)
+  const showLoading = isLoading || !profile.name;
 
   return (
     <section 
@@ -59,31 +63,50 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h1 className="text-4xl md:text-display-lg font-bold mb-4">
+            <h1 className="text-4xl md:text-display-lg font-bold mb-4 flex flex-col md:block items-center justify-center gap-2">
               <span className="text-foreground">Hi, 我是</span>{' '}
-              <span className="text-gradient-primary">{profile.name}</span>
+              {showLoading ? (
+                <Skeleton className="h-12 w-48 inline-block align-middle bg-primary/20" />
+              ) : (
+                <span className="text-gradient-primary">{profile.name}</span>
+              )}
             </h1>
           </motion.div>
 
           {/* Title/Role */}
-          <motion.h2
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            className="text-2xl md:text-headline-lg text-foreground mb-6"
+            className="mb-6 flex justify-center"
           >
-            {profile.title}
-          </motion.h2>
+            {showLoading ? (
+               <Skeleton className="h-8 w-64 bg-muted/50" />
+            ) : (
+              <h2 className="text-2xl md:text-headline-lg text-foreground">
+                {profile.title}
+              </h2>
+            )}
+          </motion.div>
 
           {/* Slogan */}
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="text-lg md:text-headline-sm text-muted-foreground mb-10 max-w-2xl mx-auto"
+            className="mb-10 max-w-2xl mx-auto flex justify-center"
           >
-            {profile.slogan}
-          </motion.p>
+            {showLoading ? (
+              <div className="space-y-2 w-full max-w-md">
+                 <Skeleton className="h-4 w-full bg-muted/30" />
+                 <Skeleton className="h-4 w-3/4 mx-auto bg-muted/30" />
+              </div>
+            ) : (
+              <p className="text-lg md:text-headline-sm text-muted-foreground">
+                {profile.slogan}
+              </p>
+            )}
+          </motion.div>
 
           {/* CTA Buttons */}
           <motion.div
