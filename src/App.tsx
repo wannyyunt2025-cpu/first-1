@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./hooks/useTheme";
 import Index from "./pages/Index";
-import Login from "./pages/Login";
+import Login from "./pages/login/index";
 import Admin from "./pages/admin/index";
 import ProjectDetail from "./pages/project/ProjectDetail";
 import ResumePreview from "./pages/resume/index";
