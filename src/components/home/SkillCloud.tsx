@@ -1,43 +1,25 @@
 import { motion } from 'framer-motion';
 import { useSkills } from '@/hooks/useSkills';
 
-const skillColors = [
-  'from-primary to-purple-500',
-  'from-cyan-500 to-primary',
-  'from-purple-500 to-pink-500',
-  'from-primary to-cyan-400',
-  'from-indigo-500 to-primary',
-];
-
 export function SkillCloud() {
   const { getTopSkills } = useSkills();
-  const topSkills = getTopSkills(5);
+  const topSkills = getTopSkills(10); // 展示更多技能
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.4,
-        ease: [0.16, 1, 0.3, 1],
-      },
-    },
-  };
+  // 定义每个 Pill 的随机浮动动画
+  const floatAnimation = (index: number) => ({
+    y: ["-5%", "5%"],
+    transition: {
+      duration: 3 + Math.random() * 2, // 随机持续时间，避免同步
+      repeat: Infinity,
+      repeatType: "reverse" as const,
+      ease: "easeInOut",
+      delay: index * 0.2,
+    }
+  });
 
   return (
-    <section id="skills" className="pt-20 pb-12 md:pt-32 md:pb-16">
-      <div className="container mx-auto px-4 md:px-6">
+    <section id="skills" className="pt-20 pb-12 md:pt-32 md:pb-16 overflow-hidden">
+      <div className="container mx-auto px-4 md:px-6 relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -53,53 +35,32 @@ export function SkillCloud() {
           </p>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto"
-        >
+        <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto my-12 p-4">
           {topSkills.map((skill, index) => (
             <motion.div
               key={skill.id}
-              variants={itemVariants}
-              whileHover={{ scale: 1.05, y: -2 }}
-              className="group relative"
+              // 基础浮动动画
+              animate={floatAnimation(index)}
+              // 初始入场动画
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.05 }}
+              viewport={{ once: true }}
+              className="relative group"
             >
-              <div 
-                className={`
-                  px-6 py-3 rounded-full
-                  bg-gradient-to-r ${skillColors[index % skillColors.length]}
-                  text-primary-foreground font-semibold
-                  shadow-lg hover:shadow-xl
-                  transition-all duration-300
-                  cursor-default
-                `}
-              >
-                <span className="relative z-10">{skill.name}</span>
-              </div>
+              {/* 背景光晕层 (Hover时显现) */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-purple-600 rounded-full blur opacity-0 group-hover:opacity-30 transition duration-500"></div>
               
-              {/* Glow effect on hover */}
-              <div 
-                className={`
-                  absolute inset-0 rounded-full
-                  bg-gradient-to-r ${skillColors[index % skillColors.length]}
-                  opacity-0 group-hover:opacity-50
-                  blur-xl transition-opacity duration-300
-                  -z-10
-                `}
-              />
-              
-              {/* Weight indicator tooltip */}
-              <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <div className="bg-card px-2 py-1 rounded text-xs text-muted-foreground whitespace-nowrap">
-                  熟练度: {skill.weight}%
-                </div>
+              {/* Pill 本体 */}
+              <div className="relative px-6 py-2.5 bg-background-saliant border border-border/50 rounded-full 
+                              text-sm font-medium text-muted-foreground cursor-default 
+                              transition-all duration-300 
+                              group-hover:text-white group-hover:border-primary/50 group-hover:shadow-glow-sm">
+                {skill.name}
               </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Additional skill categories hint */}
         <motion.p

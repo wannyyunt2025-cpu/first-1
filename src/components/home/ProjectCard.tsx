@@ -1,9 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, User } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { ArrowUpRight, Calendar, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Project } from '@/types';
 
 interface ProjectCardProps {
@@ -29,67 +27,73 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
         delay: index * 0.1,
         ease: [0.16, 1, 0.3, 1],
       }}
+      className="h-full"
     >
-      <Card className="group h-full bg-card border-border/50 hover:border-primary/40 transition-all duration-300 hover:shadow-card-hover overflow-hidden">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-1 flex-1">
-              <h3 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
-                {project.name}
-              </h3>
-              <div className="flex flex-wrap items-center gap-3 text-base text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <User className="h-4 w-4" />
-                  {project.role}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  {formatDateRange(project.startDate, project.endDate)}
-                </span>
-              </div>
-            </div>
+      <Link 
+        to={`/project/${project.id}`}
+        className="group relative flex flex-col h-full rounded-2xl bg-background-saliant p-6 
+                   border border-border/50
+                   shadow-card transition-all duration-300 
+                   hover:bg-background-elevated hover:shadow-card-hover hover:-translate-y-1"
+      >
+        {/* 顶部：标题与日期 */}
+        <div className="flex flex-col gap-2 mb-4">
+          <div className="flex justify-between items-start">
+            <h3 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+              {project.name}
+            </h3>
+            {/* 右上角箭头，Hover 时显现并移动 */}
+            <ArrowUpRight className="w-5 h-5 text-muted-foreground opacity-0 -translate-x-2 translate-y-2 
+                                     group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all" />
           </div>
-        </CardHeader>
+          
+          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5" />
+              {project.role}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              {formatDateRange(project.startDate, project.endDate)}
+            </span>
+          </div>
+        </div>
 
-        <CardContent className="space-y-4">
-          {/* Key Result - Highlighted */}
-          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-            <p className="text-base font-medium text-primary mb-1">Key Result</p>
-            <p className="text-base text-foreground line-clamp-2">
-              {project.result}
-            </p>
+        {/* 中部：描述 (Situation + Task 简述) */}
+        <p className="text-muted-foreground mb-6 line-clamp-3 text-sm leading-relaxed">
+          {project.situation} {project.task}
+        </p>
+        
+        {/* 底部：核心成果 (Bento小模块) 与 标签 */}
+        <div className="space-y-4 mt-auto">
+          {/* Key Result */}
+          <div className="relative overflow-hidden rounded-lg bg-primary/10 p-3 border border-primary/20">
+             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-50"></div>
+             <p className="relative text-sm font-medium text-primary-foreground/90 leading-relaxed">
+               <span className="text-primary font-bold mr-2">🎯 Key Result:</span>
+               {project.result}
+             </p>
           </div>
 
-          {/* Keywords */}
+          {/* 技术栈标签 */}
           <div className="flex flex-wrap gap-2">
             {project.keywords.slice(0, 4).map((keyword, idx) => (
               <Badge 
                 key={idx} 
-                variant="secondary"
-                className="text-sm bg-secondary/50 text-secondary-foreground hover:bg-secondary/70"
+                variant="secondary" 
+                className="bg-muted/50 hover:bg-muted text-muted-foreground font-normal border-transparent"
               >
                 {keyword}
               </Badge>
             ))}
             {project.keywords.length > 4 && (
-              <Badge variant="outline" className="text-sm text-muted-foreground">
+              <Badge variant="outline" className="text-xs text-muted-foreground border-border/50">
                 +{project.keywords.length - 4}
               </Badge>
             )}
           </div>
-
-          {/* View Detail Button */}
-          <Link to={`/project/${project.id}`}>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between group/btn hover:bg-primary/10 text-muted-foreground hover:text-primary"
-            >
-              查看详情
-              <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
+        </div>
+      </Link>
     </motion.div>
   );
 }

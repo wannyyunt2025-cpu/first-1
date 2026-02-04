@@ -23,11 +23,16 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
+        background: {
+          DEFAULT: "hsl(var(--background))",
+          saliant: "hsl(var(--background-saliant))",
+          elevated: "hsl(var(--background-elevated))",
+        },
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          hover: "hsl(var(--primary-hover))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -145,6 +150,10 @@ export default {
       boxShadow: {
         glow: "var(--shadow-glow)",
         "card-hover": "var(--shadow-card-hover)",
+        "glow-sm": "var(--shadow-glow-sm)",
+      },
+      backdropBlur: {
+        xs: "2px",
       },
     },
   },
