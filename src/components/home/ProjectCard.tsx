@@ -67,11 +67,10 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
         {/* 底部：核心成果 (Bento小模块) 与 标签 */}
         <div className="space-y-4 mt-auto">
           {/* Key Result */}
-          <div className="relative overflow-hidden rounded-lg bg-primary/10 p-3 border border-primary/20">
-             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-50"></div>
-             <p className="relative text-sm font-medium text-primary-foreground/90 leading-relaxed">
+          <div className="relative overflow-hidden rounded-lg bg-accent/5 p-3 border border-border/40">
+             <p className="relative text-sm font-medium text-foreground leading-relaxed">
                <span className="text-primary font-bold mr-2">🎯 Key Result:</span>
-               {project.result}
+               <span className="text-muted-foreground">{project.result}</span>
              </p>
           </div>
 
