@@ -23,6 +23,8 @@ export function AIChatWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  // 新增 sessionId 状态，每次刷新页面生成一个新的，确保会话隔离
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -92,7 +94,8 @@ export function AIChatWidget() {
         body: JSON.stringify({
           message: userMessage,
           systemPrompt,
-          history: historyContext
+          history: historyContext,
+          sessionId // 传递 sessionId 给后端
         })
       });
 
