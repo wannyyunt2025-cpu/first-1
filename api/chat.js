@@ -6,7 +6,8 @@ export default async function handler(req, res) {
 
   // 从服务端环境变量获取密钥
   const apiKey = process.env.ALI_BAILIAN_API_KEY;
-  const appId = process.env.ALI_BAILIAN_APP_ID;
+  // 优先使用专用 Chat App ID，如果没有则回退到通用 ID
+  const appId = process.env.ALI_BAILIAN_CHAT_APP_ID || process.env.ALI_BAILIAN_APP_ID;
 
   if (!apiKey || !appId) {
     console.error('Missing Ali Bailian credentials in server environment');
