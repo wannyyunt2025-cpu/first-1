@@ -4,6 +4,7 @@ import { HeroSection } from '@/components/home/HeroSection';
 import { SkillCloud } from '@/components/home/SkillCloud';
 import { ProjectList } from '@/components/home/ProjectList';
 import { CommentSection } from '@/components/home/CommentSection';
+import { AIChatWidget } from '@/components/ai/AIChatWidget';
 
 const Index = () => {
   return (
@@ -16,6 +17,7 @@ const Index = () => {
         <CommentSection />
       </main>
       <Footer />
+      <AIChatWidget />
     </div>
   );
 };
