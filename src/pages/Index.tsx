@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { HeroSection } from '@/components/home/HeroSection';
@@ -6,8 +7,16 @@ import { ProjectList } from '@/components/home/ProjectList';
 import { CommentSection } from '@/components/home/CommentSection';
 import { AIChatWidget } from '@/components/ai/AIChatWidget';
 import { motion } from 'framer-motion';
+import { useProfile } from '@/hooks/useProfile';
 
 const Index = () => {
+  const { profile } = useProfile();
+
+  useEffect(() => {
+    const name = profile?.name?.trim();
+    document.title = name ? `${name} | 动态个人主页` : '动态个人主页';
+  }, [profile?.name]);
+
   return (
     <div className="min-h-screen bg-background relative">
       {/* 全局背景层 - Fixed Position */}

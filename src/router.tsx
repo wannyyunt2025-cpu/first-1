@@ -3,6 +3,7 @@ import NotFound from "./pages/NotFound";
 import ProjectDetail from "./pages/project/ProjectDetail";
 import Admin from "./pages/admin";
 import Login from "./pages/login";
+import Retro from "./pages/Retro";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AppShell } from "./components/layout/AppShell";
 
@@ -20,6 +21,11 @@ export const routers = [
           path: "project/:id",
           name: 'project-detail',
           element: <ProjectDetail />,
+        },
+        {
+          path: "retro",
+          name: 'project-retro',
+          element: <Retro />,
         },
         {
           path: "login",

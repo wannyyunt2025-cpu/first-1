@@ -18,6 +18,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    document.title = '登录 | 动态个人主页';
+  }, []);
+
   // 如果已登录，直接跳转到admin
   useEffect(() => {
     if (isAuthenticated) {

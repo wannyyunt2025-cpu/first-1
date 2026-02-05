@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, User, Wrench, FolderOpen, GraduationCap, MessageSquare, Download, Upload, LogOut, Database, FileText } from 'lucide-react';
@@ -16,6 +16,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function Admin() {
+  useEffect(() => {
+    document.title = '管理后台 | 动态个人主页';
+  }, []);
+
   const { toast } = useToast();
   const navigate = useNavigate();
   const { logout } = useAuth();

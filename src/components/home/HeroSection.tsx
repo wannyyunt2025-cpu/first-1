@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowDown, Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowDown, Mail, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProfile } from '@/hooks/useProfile';
@@ -102,6 +103,19 @@ export function HeroSection() {
               <Mail className="h-4 w-4" />
               获取联系方式
             </Button>
+          </motion.div>
+
+          {/* Retro Guide Link */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+            className="mt-6"
+          >
+            <Link to="/retro" className="inline-flex items-center gap-2 text-sm text-muted-foreground/60 hover:text-primary transition-colors group">
+              <Rocket className="h-4 w-4 group-hover:-translate-y-1 transition-transform" />
+              <span>了解我是如何用 AI 构建这个网站的</span>
+            </Link>
           </motion.div>
 
           {/* Scroll indicator */}

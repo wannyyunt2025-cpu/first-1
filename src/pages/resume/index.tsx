@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, FileText, Download, RefreshCw, Sparkles, Calendar, User, Target, Zap, Trophy } from 'lucide-react';
@@ -27,6 +27,11 @@ export default function Resume() {
 
   const education = getEducation();
   const topSkills = getTopSkills(10);
+
+  useEffect(() => {
+    const name = profile?.name?.trim();
+    document.title = name ? `简历生成 | ${name}` : '简历生成 | 动态个人主页';
+  }, [profile?.name]);
 
   const handleGenerate = () => {
     if (!jdText.trim()) {

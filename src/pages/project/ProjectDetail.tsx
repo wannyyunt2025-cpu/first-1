@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, User, Target, Lightbulb, Zap, Trophy, Mail } from 'lucide-react';
@@ -24,6 +24,10 @@ export default function ProjectDetail() {
   const [showContactModal, setShowContactModal] = useState(false);
   
   const project = getById(id || '');
+
+  useEffect(() => {
+    document.title = project ? `${project.name} | 项目详情` : '项目不存在 | 动态个人主页';
+  }, [project?.name]);
 
   if (!project) {
     return (

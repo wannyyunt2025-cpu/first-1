@@ -32,11 +32,26 @@ export function Navbar() {
   const handleNavClick = (href: string) => {
     setIsMobileMenuOpen(false);
     if (href.startsWith('/#')) {
-      const id = href.replace('/#', '');
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      // 处理锚点跳转 (现有逻辑)
+      // 如果当前不在首页，先跳转到首页再滚动 (可选优化，这里假设主要在首页使用)
+      if (location.pathname !== '/') {
+        navigate('/'); // 先回到首页，再执行锚点滚动
+        // 由于 React Router 的 hash 处理可能需要一点延迟，这里简化处理
+        setTimeout(() => {
+          const id = href.replace('/#', '');
+          const element = document.getElementById(id);
+          if (element) element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } else {
+        const id = href.replace('/#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
       }
+    } else {
+      // 处理普通页面跳转 (如 /retro)
+      navigate(href);
     }
   };
 
