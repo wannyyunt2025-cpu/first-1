@@ -24,31 +24,32 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: {
-          DEFAULT: "hsl(var(--background))",
-          saliant: "hsl(var(--background-saliant))",
-          elevated: "hsl(var(--background-elevated))",
+          DEFAULT: "#0F172A", // 深蓝色背景 (Lofi Midnight)
+          saliant: "#1E293B", // 稍浅的深蓝色，用于卡片
+          elevated: "#334155", // 悬浮态
+          overlay: "rgba(15, 23, 42, 0.8)", // 遮罩层
         },
-        foreground: "hsl(var(--foreground))",
+        foreground: "#F8FAFC", // 浅灰白色文字
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-          hover: "hsl(var(--primary-hover))",
+          DEFAULT: "#F59E0B", // 温暖的橙黄色 (窗户灯光)
+          foreground: "#0F172A",
+          hover: "#D97706",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "#334155", // 次级深蓝
+          foreground: "#F1F5F9",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#1E293B",
+          foreground: "#94A3B8", // 柔和的灰色文本
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#F59E0B", // 强调色同主色
+          foreground: "#0F172A",
+        },
+        card: {
+          DEFAULT: "#1E293B",
+          foreground: "#F8FAFC",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -76,14 +77,15 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Playfair Display", "Merriweather", "serif"], // 艺术字体
       },
       fontSize: {
-        "display-lg": ["56px", { lineHeight: "64px", fontWeight: "700" }],
-        "display-sm": ["40px", { lineHeight: "48px", fontWeight: "700" }],
-        "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }],
-        "headline-sm": ["24px", { lineHeight: "32px", fontWeight: "600" }],
-        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
-        "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+        "display-lg": ["88px", { lineHeight: "1.1", fontWeight: "700", fontFamily: "Cinzel Decorative, serif", letterSpacing: "-0.02em" }],
+        "display-sm": ["56px", { lineHeight: "1.2", fontWeight: "700", fontFamily: "Cinzel Decorative, serif", letterSpacing: "-0.01em" }],
+        "headline-lg": ["40px", { lineHeight: "1.3", fontWeight: "600", fontFamily: "Playfair Display, serif" }],
+        "headline-sm": ["28px", { lineHeight: "1.4", fontWeight: "600", fontFamily: "Playfair Display, serif" }],
+        "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+        "body-sm": ["15px", { lineHeight: "1.6", fontWeight: "400" }],
       },
       spacing: {
         xs: "4px",
@@ -142,15 +144,16 @@ export default {
         glow: "glow 2s ease-in-out infinite",
       },
       backgroundImage: {
-        "gradient-primary": "var(--gradient-primary)",
-        "gradient-accent": "var(--gradient-accent)",
-        "gradient-hero": "var(--gradient-hero)",
-        "gradient-card-hover": "var(--gradient-card-hover)",
+        "gradient-primary": "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)", // 温暖的橙色渐变
+        "gradient-accent": "linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%)", // 深蓝色辅助渐变
+        "gradient-hero": "radial-gradient(circle at 50% 0%, #1E293B 0%, #0F172A 100%)", // 夜空背景
+        "gradient-card-hover": "linear-gradient(180deg, rgba(245, 158, 11, 0.05) 0%, rgba(245, 158, 11, 0) 100%)",
+        "noise": "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E\")",
       },
       boxShadow: {
-        glow: "var(--shadow-glow)",
-        "card-hover": "var(--shadow-card-hover)",
-        "glow-sm": "var(--shadow-glow-sm)",
+        glow: "0 0 20px rgba(245, 158, 11, 0.3)", // 暖光晕
+        "card-hover": "0 10px 30px -10px rgba(0, 0, 0, 0.5)", // 深邃的阴影
+        "glow-sm": "0 0 10px rgba(245, 158, 11, 0.2)",
       },
       backdropBlur: {
         xs: "2px",

@@ -49,13 +49,13 @@ export function SkillCloud() {
               className="relative group"
             >
               {/* 背景光晕层 (Hover时显现) */}
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-purple-600 rounded-full blur opacity-0 group-hover:opacity-30 transition duration-500"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 to-primary/20 rounded-full blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
               
               {/* Pill 本体 */}
-              <div className="relative px-6 py-2.5 bg-background-saliant border border-border/50 rounded-full 
+              <div className="relative px-6 py-2.5 bg-background-elevated border border-white/5 rounded-full 
                               text-sm font-medium text-muted-foreground cursor-default 
-                              transition-all duration-300 
-                              group-hover:text-white group-hover:border-primary/50 group-hover:shadow-glow-sm">
+                              transition-all duration-300 backdrop-blur-md
+                              group-hover:text-primary-foreground group-hover:border-primary/50 group-hover:shadow-glow-sm">
                 {skill.name}
               </div>
             </motion.div>

@@ -20,7 +20,8 @@ export function ProjectList() {
   };
 
   return (
-    <section id="projects" className="pt-12 pb-20 md:pt-16 md:pb-32 bg-secondary/20">
+    // 移除 bg-secondary/20，改为透明，以便透出全局背景
+    <section id="projects" className="pt-12 pb-20 md:pt-16 md:pb-32 relative z-10">
       <div className="container mx-auto px-4 md:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

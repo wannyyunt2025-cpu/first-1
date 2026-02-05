@@ -24,51 +24,22 @@ export function HeroSection() {
     <section 
       id="about"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      style={{ background: 'var(--gradient-hero)' }}
+      // 背景已移至全局 (Index.tsx)，此处保持透明
     >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{ 
-            scale: [1, 1.2, 1],
-            opacity: [0.1, 0.15, 0.1],
-          }}
-          transition={{ 
-            duration: 8,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 bg-primary/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{ 
-            scale: [1, 1.3, 1],
-            opacity: [0.08, 0.12, 0.08],
-          }}
-          transition={{ 
-            duration: 10,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 1,
-          }}
-          className="absolute -bottom-1/4 -right-1/4 w-2/3 h-2/3 bg-accent/10 rounded-full blur-3xl"
-        />
-      </div>
-
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           {/* Title */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h1 className="text-4xl md:text-display-lg font-bold mb-4 flex flex-col md:block items-center justify-center gap-2">
-              <span className="text-foreground">Hi, 我是</span>{' '}
+            <h1 className="text-display-sm md:text-display-lg font-bold mb-4 flex flex-col md:block items-center justify-center gap-2 tracking-tight font-display">
+              <span className="text-foreground drop-shadow-lg italic">Hi, 我是</span>{' '}
               {showLoading ? (
-                <Skeleton className="h-12 w-48 inline-block align-middle bg-primary/20" />
+                <Skeleton className="h-20 w-64 inline-block align-middle bg-primary/10" />
               ) : (
-                <span className="text-gradient-primary">{profile.name}</span>
+                <span className="text-primary drop-shadow-glow">{profile.name}</span>
               )}
             </h1>
           </motion.div>
@@ -77,13 +48,13 @@ export function HeroSection() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            className="mb-6 flex justify-center"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            className="mb-8 flex justify-center"
           >
             {showLoading ? (
-               <Skeleton className="h-8 w-64 bg-muted/50" />
+               <Skeleton className="h-10 w-80 bg-muted/20" />
             ) : (
-              <h2 className="text-2xl md:text-headline-lg text-foreground">
+              <h2 className="text-headline-sm md:text-headline-lg text-foreground/90 font-light font-display italic tracking-wide">
                 {profile.title}
               </h2>
             )}
@@ -93,16 +64,16 @@ export function HeroSection() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
             className="mb-10 max-w-2xl mx-auto flex justify-center"
           >
             {showLoading ? (
               <div className="space-y-2 w-full max-w-md">
-                 <Skeleton className="h-4 w-full bg-muted/30" />
-                 <Skeleton className="h-4 w-3/4 mx-auto bg-muted/30" />
+                 <Skeleton className="h-4 w-full bg-muted/10" />
+                 <Skeleton className="h-4 w-3/4 mx-auto bg-muted/10" />
               </div>
             ) : (
-              <p className="text-lg md:text-headline-sm text-muted-foreground">
+              <p className="text-lg md:text-headline-sm text-muted-foreground font-light leading-relaxed">
                 {profile.slogan}
               </p>
             )}
@@ -112,13 +83,13 @@ export function HeroSection() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Button 
               size="lg" 
               onClick={scrollToProjects}
-              className="bg-gradient-primary hover:opacity-90 text-primary-foreground font-semibold px-8 shadow-glow"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-8 shadow-glow transition-all duration-300 hover:scale-105"
             >
               查看我的项目
             </Button>
@@ -126,7 +97,7 @@ export function HeroSection() {
               variant="outline" 
               size="lg"
               onClick={() => setShowContactModal(true)}
-              className="border-primary/50 text-primary hover:bg-primary/10 gap-2"
+              className="border-primary/20 text-primary hover:bg-primary/10 hover:text-primary hover:border-primary/40 gap-2 backdrop-blur-sm"
             >
               <Mail className="h-4 w-4" />
               获取联系方式
