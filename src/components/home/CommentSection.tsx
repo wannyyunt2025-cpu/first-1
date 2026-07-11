@@ -45,16 +45,16 @@ export function CommentSection() {
   };
 
   return (
-    <section id="comments" className="py-20 md:py-32">
+    <section id="comments" className="section">
       <div className="container mx-auto px-4 md:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-headline-lg font-bold text-foreground mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             留言互动
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
@@ -71,7 +71,7 @@ export function CommentSection() {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <Card className="bg-card border-border/50">
+              <Card className="border border-border">
                 <CardContent className="pt-6">
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -82,7 +82,7 @@ export function CommentSection() {
                         value={nickname}
                         onChange={(e) => setNickname(e.target.value)}
                         maxLength={20}
-                        className="bg-secondary/50 border-border focus:border-primary"
+                        className="border-border"
                       />
                     </div>
                     <div>
@@ -95,7 +95,7 @@ export function CommentSection() {
                         rows={4}
                         maxLength={500}
                         aria-describedby="comment-content-counter"
-                        className="bg-secondary/50 border-border focus:border-primary resize-none"
+                        className="border-border resize-none"
                       />
                       <div className="flex justify-between mt-1">
                         <span id="comment-content-counter" className="text-sm text-muted-foreground">
@@ -107,7 +107,7 @@ export function CommentSection() {
                       <Button
                         type="submit"
                         disabled={isLoading || content.length < 5}
-                        className="w-full bg-gradient-primary hover:opacity-90"
+                        className="w-full btn-hover"
                       >
                         <Send className="h-4 w-4 mr-2" />
                         提交留言
@@ -141,28 +141,28 @@ export function CommentSection() {
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <Card className="bg-secondary/30 border-border/30">
+                      <Card className="border border-border">
                         <CardContent className="pt-4 pb-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                               <User className="h-4 w-4 text-primary" />
                             </div>
                             <div>
-                              <p className="text-base font-medium text-foreground">
+                              <p className="text-sm font-medium text-foreground">
                                 {comment.nickname || '匿名用户'}
                               </p>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-xs text-muted-foreground">
                                 {formatDate(comment.createdAt)}
                               </p>
                             </div>
                           </div>
-                          <p className="text-base text-foreground/90 pl-10">
+                          <p className="text-sm text-muted-foreground">
                             {comment.content}
                           </p>
                           {comment.reply && (
-                            <div className="mt-3 ml-10 p-3 rounded-lg bg-primary/5 border-l-2 border-primary">
-                              <p className="text-sm text-primary mb-1">作者回复</p>
-                              <p className="text-base text-foreground/80">
+                            <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                              <p className="text-xs font-medium text-primary mb-1">作者回复</p>
+                              <p className="text-sm text-muted-foreground">
                                 {comment.reply}
                               </p>
                             </div>

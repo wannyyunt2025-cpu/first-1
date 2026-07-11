@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, Wrench, FolderOpen, GraduationCap, MessageSquare, Download, Upload, LogOut, Database, FileText } from 'lucide-react';
+import { ArrowLeft, User, Wrench, FolderOpen, GraduationCap, MessageSquare, Download, Upload, LogOut, Database, FileText, BookOpen, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProfileForm } from '@/components/admin/ProfileForm';
 import { SkillForm } from '@/components/admin/SkillForm';
 import { ProjectForm } from '@/components/admin/ProjectForm';
+import { LearningRecordForm } from '@/components/admin/LearningRecordForm';
+import { InsightCardForm } from '@/components/admin/InsightCardForm';
 import { EducationForm } from '@/components/admin/EducationForm';
 import { CommentManager } from '@/components/admin/CommentManager';
 import { DataMigration } from '@/components/admin/DataMigration';
@@ -83,6 +85,8 @@ export default function Admin() {
     { id: 'profile', label: '基础信息', icon: User },
     { id: 'skills', label: '技能管理', icon: Wrench },
     { id: 'projects', label: '项目经历', icon: FolderOpen },
+    { id: 'learning', label: '学习经历', icon: BookOpen },
+    { id: 'insights', label: '观点卡片', icon: Brain },
     { id: 'education', label: '教育背景', icon: GraduationCap },
     { id: 'comments', label: '留言管理', icon: MessageSquare },
     { id: 'resume', label: '简历生成', icon: FileText },
@@ -144,7 +148,7 @@ export default function Admin() {
           transition={{ duration: 0.5 }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2 h-auto bg-transparent p-0 mb-8">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-2 h-auto bg-transparent p-0 mb-8">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -154,7 +158,7 @@ export default function Admin() {
                     className="flex items-center gap-2 px-4 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground bg-secondary/50 border border-border/50 rounded-lg"
                   >
                     <Icon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{tab.label}</span>
+                    <span className="text-xs sm:text-sm">{tab.label}</span>
                   </TabsTrigger>
                 );
               })}
@@ -170,6 +174,14 @@ export default function Admin() {
 
             <TabsContent value="projects">
               <ProjectForm />
+            </TabsContent>
+
+            <TabsContent value="learning">
+              <LearningRecordForm />
+            </TabsContent>
+
+            <TabsContent value="insights">
+              <InsightCardForm />
             </TabsContent>
 
             <TabsContent value="education">

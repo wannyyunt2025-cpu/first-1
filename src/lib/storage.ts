@@ -1,4 +1,16 @@
-import { UserData, defaultUserData, Profile, Skill, Project, Education, Portfolio, Comment, ResumeRecord } from '@/types';
+import {
+  UserData,
+  defaultUserData,
+  Profile,
+  Skill,
+  Project,
+  LearningRecord,
+  InsightCard,
+  Education,
+  Portfolio,
+  Comment,
+  ResumeRecord,
+} from '@/types';
 
 const STORAGE_KEY = 'dynamic_profile_data';
 
@@ -105,6 +117,82 @@ export function updateProject(project: Project): void {
 export function deleteProject(id: string): void {
   const data = getUserData();
   data.projects = data.projects.filter(p => p.id !== id);
+  saveUserData(data);
+}
+
+// Learning Records 操作
+export function getLearningRecords(): LearningRecord[] {
+  return (getUserData().learningRecords || []).sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+export function getPublicLearningRecords(): LearningRecord[] {
+  return getLearningRecords().filter(record => record.isPublic);
+}
+
+export function saveLearningRecords(records: LearningRecord[]): void {
+  const data = getUserData();
+  data.learningRecords = records;
+  saveUserData(data);
+}
+
+export function addLearningRecord(record: LearningRecord): void {
+  const data = getUserData();
+  data.learningRecords = [...(data.learningRecords || []), record];
+  saveUserData(data);
+}
+
+export function updateLearningRecord(record: LearningRecord): void {
+  const data = getUserData();
+  const records = data.learningRecords || [];
+  const index = records.findIndex(item => item.id === record.id);
+  if (index !== -1) {
+    records[index] = record;
+    data.learningRecords = records;
+    saveUserData(data);
+  }
+}
+
+export function deleteLearningRecord(id: string): void {
+  const data = getUserData();
+  data.learningRecords = (data.learningRecords || []).filter(record => record.id !== id);
+  saveUserData(data);
+}
+
+// Insight Cards 操作
+export function getInsightCards(): InsightCard[] {
+  return (getUserData().insightCards || []).sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+export function getPublicInsightCards(): InsightCard[] {
+  return getInsightCards().filter(card => card.isPublic);
+}
+
+export function saveInsightCards(cards: InsightCard[]): void {
+  const data = getUserData();
+  data.insightCards = cards;
+  saveUserData(data);
+}
+
+export function addInsightCard(card: InsightCard): void {
+  const data = getUserData();
+  data.insightCards = [...(data.insightCards || []), card];
+  saveUserData(data);
+}
+
+export function updateInsightCard(card: InsightCard): void {
+  const data = getUserData();
+  const cards = data.insightCards || [];
+  const index = cards.findIndex(item => item.id === card.id);
+  if (index !== -1) {
+    cards[index] = card;
+    data.insightCards = cards;
+    saveUserData(data);
+  }
+}
+
+export function deleteInsightCard(id: string): void {
+  const data = getUserData();
+  data.insightCards = (data.insightCards || []).filter(card => card.id !== id);
   saveUserData(data);
 }
 
@@ -243,18 +331,9 @@ export function resetData(): void {
 
 // 生成唯一ID
 export function generateId(): string {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-
-  if (typeof crypto !== 'undefined' && 'getRandomValues' in crypto) {
-    const bytes = crypto.getRandomValues(new Uint8Array(16));
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-
-    const toHex = (n: number) => n.toString(16).padStart(2, '0');
-    const hex = Array.from(bytes, toHex).join('');
-    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  const webCrypto = globalThis.crypto as Crypto | undefined;
+  if (webCrypto?.randomUUID) {
+    return webCrypto.randomUUID();
   }
 
   return Date.now().toString(36) + Math.random().toString(36).slice(2);

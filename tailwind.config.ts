@@ -24,32 +24,28 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: {
-          DEFAULT: "#0F172A", // 深蓝色背景 (Lofi Midnight)
-          saliant: "#1E293B", // 稍浅的深蓝色，用于卡片
-          elevated: "#334155", // 悬浮态
-          overlay: "rgba(15, 23, 42, 0.8)", // 遮罩层
+          DEFAULT: "hsl(var(--background))",
+          saliant: "#1E293B",
+          elevated: "#334155",
+          overlay: "rgba(15, 23, 42, 0.8)",
         },
-        foreground: "#F8FAFC", // 浅灰白色文字
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#F59E0B", // 温暖的橙黄色 (窗户灯光)
-          foreground: "#0F172A",
-          hover: "#D97706",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+          hover: "hsl(var(--primary) / 0.86)",
         },
         secondary: {
-          DEFAULT: "#334155", // 次级深蓝
-          foreground: "#F1F5F9",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         muted: {
-          DEFAULT: "#1E293B",
-          foreground: "#94A3B8", // 柔和的灰色文本
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#F59E0B", // 强调色同主色
-          foreground: "#0F172A",
-        },
-        card: {
-          DEFAULT: "#1E293B",
-          foreground: "#F8FAFC",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

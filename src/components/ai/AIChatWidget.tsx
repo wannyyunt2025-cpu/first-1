@@ -8,7 +8,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useProfile } from '@/hooks/useProfile';
 import { useSkills } from '@/hooks/useSkills';
 import { useProjects } from '@/hooks/useProjects';
-import { useEducation } from '@/hooks/useEducation';
+import { useInsightCards } from '@/hooks/useInsightCards';
+import { useLearningRecords } from '@/hooks/useLearningRecords';
 import { generateSystemPrompt } from '@/lib/system-prompt';
 import { cn } from '@/lib/utils';
 import { getEducation, getPortfolios } from '@/lib/storage';
@@ -32,6 +33,8 @@ export function AIChatWidget() {
   const { profile } = useProfile();
   const { skills } = useSkills();
   const { publicProjects } = useProjects();
+  const { publicRecords: learningRecords } = useLearningRecords();
+  const { publicCards: insightCards } = useInsightCards();
   // Education 和 Portfolios 目前没有专门的 hook 暴露 data，直接从 storage 或数据库获取
   // 为了确保是最新的，这里简单处理，实际应统一通过 hook 或 context 管理
   // 由于我们已经重构了 storage 为 database-first，但 useEducation hook 还是基于 storage 的简单封装
@@ -77,6 +80,8 @@ export function AIChatWidget() {
         projects: publicProjects,
         education,
         portfolios,
+        learningRecords,
+        insightCards,
         comments: [], // 聊天暂不需要留言数据
         resumeRecords: []
       });

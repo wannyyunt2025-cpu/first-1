@@ -32,12 +32,41 @@ export interface Project {
   role: string;
   startDate: string;
   endDate: string;
+  summary?: string;        // 首页短摘要
   situation: string;       // 情境
   task: string;            // 任务
   action: string;          // 行动
   result: string;          // 结果（Key Result）
+  reflection?: string;     // 项目复盘 / 下一步
   images: string[];        // 项目图片URLs
   keywords: string[];      // 关键词标签
+  isPublic: boolean;
+  featured?: boolean;      // 是否作为首页主项目
+  sortOrder: number;
+  githubUrl?: string;
+  demoUrl?: string;
+  portfolioUrl?: string;
+}
+
+// 学习 / 训练营经历
+export interface LearningRecord {
+  id: string;
+  title: string;
+  type: 'tool' | 'bootcamp' | 'volunteer' | 'project' | 'other';
+  time: string;
+  role?: string;
+  output?: string;
+  reflection?: string;
+  isPublic: boolean;
+  sortOrder: number;
+}
+
+// AI 理解 / 观点卡片
+export interface InsightCard {
+  id: string;
+  title: string;
+  content: string;
+  sourceProjectId?: string;
   isPublic: boolean;
   sortOrder: number;
 }
@@ -86,6 +115,8 @@ export interface UserData {
   profile: Profile;
   skills: Skill[];
   projects: Project[];
+  learningRecords: LearningRecord[];
+  insightCards: InsightCard[];
   education: Education[];
   portfolios: Portfolio[];
   comments: Comment[];
@@ -115,6 +146,8 @@ export const defaultUserData: UserData = {
   profile: defaultProfile,
   skills: [],
   projects: [],
+  learningRecords: [],
+  insightCards: [],
   education: [],
   portfolios: [],
   comments: [],

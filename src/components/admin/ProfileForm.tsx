@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,8 +18,8 @@ const profileSchema = z.object({
   title: z.string().min(1, '请输入职业定位'),
   slogan: z.string().min(1, '请输入一句话介绍'),
   avatar: z.string().optional(),
-  email: z.string().email('请输入有效的邮箱地址'),
-  wechat: z.string().min(1, '请输入微信号'),
+  email: z.union([z.literal(''), z.string().email('请输入有效的邮箱地址')]),
+  wechat: z.string().optional(),
   phone: z.string().optional(),
   emailVisibility: z.enum(['public', 'semi', 'private']),
   wechatVisibility: z.enum(['public', 'semi', 'private']),
@@ -47,6 +48,21 @@ export function ProfileForm() {
     },
   });
 
+  useEffect(() => {
+    form.reset({
+      name: profile.name,
+      title: profile.title,
+      slogan: profile.slogan,
+      avatar: profile.avatar || '',
+      email: profile.contact.email,
+      wechat: profile.contact.wechat,
+      phone: profile.contact.phone || '',
+      emailVisibility: profile.visibility.email,
+      wechatVisibility: profile.visibility.wechat,
+      phoneVisibility: profile.visibility.phone,
+    });
+  }, [form, profile]);
+
   const onSubmit = (data: ProfileFormData) => {
     const newProfile: Profile = {
       ...profile,
@@ -56,7 +72,7 @@ export function ProfileForm() {
       avatar: data.avatar,
       contact: {
         email: data.email,
-        wechat: data.wechat,
+        wechat: data.wechat ?? '',
         phone: data.phone,
       },
       visibility: {
@@ -79,10 +95,12 @@ export function ProfileForm() {
   ];
 
   return (
-    <Card className="bg-card border-border/50">
-      <CardHeader>
-        <CardTitle>基础信息</CardTitle>
-        <CardDescription>管理您的个人信息和联系方式</CardDescription>
+      <Card className="bg-card border-border/50">
+        <CardHeader>
+          <CardTitle>基础信息</CardTitle>
+        <CardDescription>
+          管理首页会读取的个人信息。建议先补齐姓名、职业定位和一句话介绍，联系方式可以稍后填写。
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -96,8 +114,9 @@ export function ProfileForm() {
                   <FormItem>
                     <FormLabel>姓名</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-secondary/50" />
+                      <Input {...field} placeholder="真实姓名或昵称" className="bg-secondary/50" />
                     </FormControl>
+                    <FormDescription>请填写您的真实姓名或常用昵称</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -110,8 +129,9 @@ export function ProfileForm() {
                   <FormItem>
                     <FormLabel>职业定位</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="如：全栈开发工程师" className="bg-secondary/50" />
+                      <Input {...field} placeholder="如：AI 产品方向转型实践者 / AI 产品助理 / AI 运营方向候选人" className="bg-secondary/50" />
                     </FormControl>
+                    <FormDescription>请填写您当前的职业定位，突出 AI 产品/运营方向</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -127,11 +147,12 @@ export function ProfileForm() {
                   <FormControl>
                     <Textarea 
                       {...field} 
-                      placeholder="用一句话描述您的核心价值主张"
+                      placeholder="如：建筑学背景，持续用 AI 工具和低代码方法打磨个人产品与工作流原型"
                       className="bg-secondary/50 resize-none"
                       rows={2}
                     />
                   </FormControl>
+                  <FormDescription>请用一句话概括您的背景和核心价值，突出转型逻辑</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -167,8 +188,9 @@ export function ProfileForm() {
                         <FormItem>
                           <FormLabel>邮箱</FormLabel>
                           <FormControl>
-                            <Input {...field} type="email" className="bg-secondary/50" />
+                            <Input {...field} type="email" placeholder="选填：用于前台脱敏展示和点击复制" className="bg-secondary/50" />
                           </FormControl>
+                          <FormDescription>前台默认只显示脱敏邮箱，点击复制时才使用真实值。</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -210,8 +232,9 @@ export function ProfileForm() {
                         <FormItem>
                           <FormLabel>微信号</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-secondary/50" />
+                            <Input {...field} placeholder="选填：用于前台脱敏展示和点击复制" className="bg-secondary/50" />
                           </FormControl>
+                          <FormDescription>不填写时前台会提示“请在后台补充微信”。</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -253,8 +276,9 @@ export function ProfileForm() {
                         <FormItem>
                           <FormLabel>手机号（选填）</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-secondary/50" />
+                            <Input {...field} placeholder="建议默认保持私密，除非你明确希望展示" className="bg-secondary/50" />
                           </FormControl>
+                          <FormDescription>手机号默认不建议公开展示。</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}

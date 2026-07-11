@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Calendar, User, Target, Lightbulb, Zap, Trophy, Mail } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Target, Lightbulb, Zap, Trophy, Mail, Github, ExternalLink, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,7 +27,7 @@ export default function ProjectDetail() {
 
   useEffect(() => {
     document.title = project ? `${project.name} | 项目详情` : '项目不存在 | 动态个人主页';
-  }, [project?.name]);
+  }, [project]);
 
   if (!project) {
     return (
@@ -80,6 +80,12 @@ export default function ProjectDetail() {
     },
   ];
 
+  const projectLinks = [
+    { label: 'GitHub', url: project.githubUrl, icon: Github },
+    { label: '在线演示', url: project.demoUrl, icon: ExternalLink },
+    { label: '作品集', url: project.portfolioUrl, icon: ExternalLink },
+  ].filter((item) => item.url);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -122,6 +128,30 @@ export default function ProjectDetail() {
                 {formatDateRange(project.startDate, project.endDate)}
               </span>
             </div>
+            {project.summary && (
+              <p className="mt-6 max-w-3xl text-base leading-8 text-muted-foreground">
+                {project.summary}
+              </p>
+            )}
+            {projectLinks.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                {projectLinks.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <a
+                      key={item.label}
+                      href={item.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary"
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.label}
+                    </a>
+                  );
+                })}
+              </div>
+            )}
           </motion.div>
 
           {/* Keywords */}
@@ -203,6 +233,31 @@ export default function ProjectDetail() {
               );
             })}
           </div>
+
+          {project.reflection && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.75 }}
+              className="mx-auto mt-8 max-w-5xl"
+            >
+              <Card className="bg-card border-border/50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-3 text-lg">
+                    <div className="rounded-lg bg-secondary p-2 text-primary">
+                      <RefreshCw className="h-5 w-5" />
+                    </div>
+                    项目复盘 / 下一步
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {project.reflection}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
 
           {/* Back to home */}
           <motion.div

@@ -20,17 +20,16 @@ export function ProjectList() {
   };
 
   return (
-    // 移除 bg-secondary/20，改为透明，以便透出全局背景
-    <section id="projects" className="pt-12 pb-20 md:pt-16 md:pb-32 relative z-10">
+    <section id="projects" className="section relative z-10">
       <div className="container mx-auto px-4 md:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-headline-lg font-bold text-foreground mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             项目经历
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
@@ -38,7 +37,7 @@ export function ProjectList() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayedProjects.map((project, index) => (
             <ProjectCard 
               key={project.id} 
@@ -53,13 +52,13 @@ export function ProjectList() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="flex justify-center mt-10"
+            className="flex justify-center mt-12"
           >
             <Button
               variant="outline"
               size="lg"
               onClick={() => setShowAll(true)}
-              className="gap-2 border-primary/50 text-primary hover:bg-primary/10"
+              className="gap-2 btn-hover"
             >
               查看更多项目
               <ChevronDown className="h-4 w-4" />
@@ -71,7 +70,7 @@ export function ProjectList() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex justify-center mt-10"
+            className="flex justify-center mt-12"
           >
             <Button
               variant="ghost"
@@ -89,7 +88,7 @@ export function ProjectList() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="mt-16 md:mt-20"
+          className="mt-16 md:mt-24"
         >
           <motion.div
             animate={{ y: [0, 10, 0] }}

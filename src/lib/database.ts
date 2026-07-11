@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import type { Profile, Skill, Project, Education, Portfolio, Comment } from '@/types';
+import type { Profile, Skill, Project, LearningRecord, InsightCard, Education, Portfolio, Comment } from '@/types';
 
 // ============================================
 // Data Mappers
@@ -69,14 +69,20 @@ type ProjectRow = {
   role: string;
   start_date: string;
   end_date: string;
+  summary?: string | null;
   situation: string | null;
   task: string | null;
   action: string | null;
   result: string | null;
+  reflection?: string | null;
   images: string[] | null;
   keywords: string[] | null;
   is_public: boolean;
+  featured?: boolean;
   sort_order: number;
+  github_url?: string | null;
+  demo_url?: string | null;
+  portfolio_url?: string | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -89,14 +95,20 @@ const mapProjectFromDB = (data: ProjectRow): Project => ({
   role: data.role ?? '',
   startDate: data.start_date ?? '',
   endDate: data.end_date ?? '',
+  summary: data.summary ?? undefined,
   situation: data.situation ?? '',
   task: data.task ?? '',
   action: data.action ?? '',
   result: data.result ?? '',
+  reflection: data.reflection ?? undefined,
   images: data.images ?? [],
   keywords: data.keywords ?? [],
   isPublic: Boolean(data.is_public),
+  featured: Boolean(data.featured),
   sortOrder: Number.isFinite(data.sort_order) ? data.sort_order : 0,
+  githubUrl: data.github_url ?? undefined,
+  demoUrl: data.demo_url ?? undefined,
+  portfolioUrl: data.portfolio_url ?? undefined,
 });
 
 const mapProjectToDB = (project: Partial<Project>): ProjectUpsert => {
@@ -105,15 +117,112 @@ const mapProjectToDB = (project: Partial<Project>): ProjectUpsert => {
   if (project.role !== undefined) dbData.role = project.role;
   if (project.startDate !== undefined) dbData.start_date = project.startDate;
   if (project.endDate !== undefined) dbData.end_date = project.endDate;
+  if (project.summary !== undefined) dbData.summary = project.summary ?? null;
   if (project.situation !== undefined) dbData.situation = project.situation ?? null;
   if (project.task !== undefined) dbData.task = project.task ?? null;
   if (project.action !== undefined) dbData.action = project.action ?? null;
   if (project.result !== undefined) dbData.result = project.result ?? null;
+  if (project.reflection !== undefined) dbData.reflection = project.reflection ?? null;
   if (project.images !== undefined) dbData.images = project.images ?? [];
   if (project.keywords !== undefined) dbData.keywords = project.keywords ?? [];
   if (project.isPublic !== undefined) dbData.is_public = project.isPublic;
+  if (project.featured !== undefined) dbData.featured = project.featured;
   if (project.sortOrder !== undefined) dbData.sort_order = project.sortOrder;
+  if (project.githubUrl !== undefined) dbData.github_url = project.githubUrl ?? null;
+  if (project.demoUrl !== undefined) dbData.demo_url = project.demoUrl ?? null;
+  if (project.portfolioUrl !== undefined) dbData.portfolio_url = project.portfolioUrl ?? null;
   return dbData;
+};
+
+type LearningRecordRow = {
+  id: string;
+  title: string;
+  type: LearningRecord['type'];
+  time: string;
+  role: string | null;
+  output: string | null;
+  reflection: string | null;
+  is_public: boolean;
+  sort_order: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type LearningRecordUpsert = Partial<Omit<LearningRecordRow, 'id' | 'created_at' | 'updated_at'>>;
+
+const mapLearningRecordFromDB = (data: LearningRecordRow): LearningRecord => ({
+  id: data.id,
+  title: data.title ?? '',
+  type: data.type ?? 'other',
+  time: data.time ?? '',
+  role: data.role ?? undefined,
+  output: data.output ?? undefined,
+  reflection: data.reflection ?? undefined,
+  isPublic: Boolean(data.is_public),
+  sortOrder: Number.isFinite(data.sort_order) ? data.sort_order : 0,
+});
+
+const mapLearningRecordToDB = (record: Partial<LearningRecord>): LearningRecordUpsert => {
+  const dbData: LearningRecordUpsert = {};
+  if (record.title !== undefined) dbData.title = record.title;
+  if (record.type !== undefined) dbData.type = record.type;
+  if (record.time !== undefined) dbData.time = record.time;
+  if (record.role !== undefined) dbData.role = record.role ?? null;
+  if (record.output !== undefined) dbData.output = record.output ?? null;
+  if (record.reflection !== undefined) dbData.reflection = record.reflection ?? null;
+  if (record.isPublic !== undefined) dbData.is_public = record.isPublic;
+  if (record.sortOrder !== undefined) dbData.sort_order = record.sortOrder;
+  return dbData;
+};
+
+type InsightCardRow = {
+  id: string;
+  title: string;
+  content: string;
+  source_project_id: string | null;
+  is_public: boolean;
+  sort_order: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type InsightCardUpsert = Partial<Omit<InsightCardRow, 'id' | 'created_at' | 'updated_at'>>;
+
+const mapInsightCardFromDB = (data: InsightCardRow): InsightCard => ({
+  id: data.id,
+  title: data.title ?? '',
+  content: data.content ?? '',
+  sourceProjectId: data.source_project_id ?? undefined,
+  isPublic: Boolean(data.is_public),
+  sortOrder: Number.isFinite(data.sort_order) ? data.sort_order : 0,
+});
+
+const mapInsightCardToDB = (card: Partial<InsightCard>): InsightCardUpsert => {
+  const dbData: InsightCardUpsert = {};
+  if (card.title !== undefined) dbData.title = card.title;
+  if (card.content !== undefined) dbData.content = card.content;
+  if (card.sourceProjectId !== undefined) dbData.source_project_id = card.sourceProjectId ?? null;
+  if (card.isPublic !== undefined) dbData.is_public = card.isPublic;
+  if (card.sortOrder !== undefined) dbData.sort_order = card.sortOrder;
+  return dbData;
+};
+
+const isMissingProjectColumnError = (error: { message?: string; code?: string } | null) => {
+  if (!error) return false;
+  return error.code === '42703' || /column .* does not exist/i.test(error.message ?? '');
+};
+
+const stripProjectUpgradeFields = (dbData: ProjectUpsert): ProjectUpsert => {
+  const {
+    summary,
+    reflection,
+    featured,
+    github_url,
+    demo_url,
+    portfolio_url,
+    ...legacyData
+  } = dbData;
+  return legacyData;
 };
 
 type EducationRow = {
@@ -340,11 +449,21 @@ export const database = {
   
   async createProject(project: Omit<Project, 'id'>): Promise<Project | null> {
     const dbData = mapProjectToDB(project);
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('projects')
       .insert(dbData)
       .select()
       .single();
+
+    if (isMissingProjectColumnError(error)) {
+      const fallback = await supabase
+        .from('projects')
+        .insert(stripProjectUpgradeFields(dbData))
+        .select()
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    }
     
     if (error) {
       console.error('创建项目失败:', error);
@@ -356,10 +475,18 @@ export const database = {
   
   async updateProject(projectId: string, updates: Partial<Project>): Promise<boolean> {
     const dbData = mapProjectToDB(updates);
-    const { error } = await supabase
+    let { error } = await supabase
       .from('projects')
       .update(dbData)
       .eq('id', projectId);
+
+    if (isMissingProjectColumnError(error)) {
+      const fallback = await supabase
+        .from('projects')
+        .update(stripProjectUpgradeFields(dbData))
+        .eq('id', projectId);
+      error = fallback.error;
+    }
     
     if (error) {
       console.error('更新项目失败:', error);
@@ -380,6 +507,144 @@ export const database = {
       return false;
     }
     
+    return true;
+  },
+
+  // ============================================
+  // Learning Records (学习经历)
+  // ============================================
+
+  async getLearningRecords(publicOnly = false): Promise<LearningRecord[]> {
+    let query = supabase
+      .from('learning_records')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (publicOnly) {
+      query = query.eq('is_public', true);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('获取学习经历失败:', error);
+      return [];
+    }
+
+    return data.map(mapLearningRecordFromDB);
+  },
+
+  async createLearningRecord(record: Omit<LearningRecord, 'id'>): Promise<LearningRecord | null> {
+    const dbData = mapLearningRecordToDB(record);
+    const { data, error } = await supabase
+      .from('learning_records')
+      .insert(dbData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('创建学习经历失败:', error);
+      return null;
+    }
+
+    return mapLearningRecordFromDB(data);
+  },
+
+  async updateLearningRecord(recordId: string, updates: Partial<LearningRecord>): Promise<boolean> {
+    const dbData = mapLearningRecordToDB(updates);
+    const { error } = await supabase
+      .from('learning_records')
+      .update(dbData)
+      .eq('id', recordId);
+
+    if (error) {
+      console.error('更新学习经历失败:', error);
+      return false;
+    }
+
+    return true;
+  },
+
+  async deleteLearningRecord(recordId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('learning_records')
+      .delete()
+      .eq('id', recordId);
+
+    if (error) {
+      console.error('删除学习经历失败:', error);
+      return false;
+    }
+
+    return true;
+  },
+
+  // ============================================
+  // Insight Cards (观点卡片)
+  // ============================================
+
+  async getInsightCards(publicOnly = false): Promise<InsightCard[]> {
+    let query = supabase
+      .from('insight_cards')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (publicOnly) {
+      query = query.eq('is_public', true);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('获取观点卡片失败:', error);
+      return [];
+    }
+
+    return data.map(mapInsightCardFromDB);
+  },
+
+  async createInsightCard(card: Omit<InsightCard, 'id'>): Promise<InsightCard | null> {
+    const dbData = mapInsightCardToDB(card);
+    const { data, error } = await supabase
+      .from('insight_cards')
+      .insert(dbData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('创建观点卡片失败:', error);
+      return null;
+    }
+
+    return mapInsightCardFromDB(data);
+  },
+
+  async updateInsightCard(cardId: string, updates: Partial<InsightCard>): Promise<boolean> {
+    const dbData = mapInsightCardToDB(updates);
+    const { error } = await supabase
+      .from('insight_cards')
+      .update(dbData)
+      .eq('id', cardId);
+
+    if (error) {
+      console.error('更新观点卡片失败:', error);
+      return false;
+    }
+
+    return true;
+  },
+
+  async deleteInsightCard(cardId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('insight_cards')
+      .delete()
+      .eq('id', cardId);
+
+    if (error) {
+      console.error('删除观点卡片失败:', error);
+      return false;
+    }
+
     return true;
   },
 

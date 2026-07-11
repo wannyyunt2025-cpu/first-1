@@ -107,12 +107,8 @@ export async function migrateToDatabase(
           title: localProfile.title,
           slogan: localProfile.slogan,
           avatar: localProfile.avatar,
-          email: localProfile.contact.email,
-          wechat: localProfile.contact.wechat,
-          phone: localProfile.contact.phone,
-          email_visibility: localProfile.visibility.email,
-          wechat_visibility: localProfile.visibility.wechat,
-          phone_visibility: localProfile.visibility.phone,
+          contact: localProfile.contact,
+          visibility: localProfile.visibility,
         });
       } else {
         // 创建新profile
@@ -121,12 +117,8 @@ export async function migrateToDatabase(
           title: localProfile.title,
           slogan: localProfile.slogan,
           avatar: localProfile.avatar,
-          email: localProfile.contact.email,
-          wechat: localProfile.contact.wechat,
-          phone: localProfile.contact.phone,
-          email_visibility: localProfile.visibility.email,
-          wechat_visibility: localProfile.visibility.wechat,
-          phone_visibility: localProfile.visibility.phone,
+          contact: localProfile.contact,
+          visibility: localProfile.visibility,
         });
       }
     }
@@ -160,16 +152,16 @@ export async function migrateToDatabase(
         await database.createProject({
           name: project.name,
           role: project.role,
-          start_date: project.startDate,
-          end_date: project.endDate,
+          startDate: project.startDate,
+          endDate: project.endDate,
           situation: project.situation,
           task: project.task,
           action: project.action,
           result: project.result,
           images: project.images,
           keywords: project.keywords,
-          is_public: project.isPublic,
-          sort_order: project.sortOrder,
+          isPublic: project.isPublic,
+          sortOrder: project.sortOrder,
         });
       }
     }
@@ -191,8 +183,8 @@ export async function migrateToDatabase(
           school: edu.school,
           degree: edu.degree,
           major: edu.major,
-          start_date: edu.startDate,
-          end_date: edu.endDate,
+          startDate: edu.startDate,
+          endDate: edu.endDate,
           description: edu.description,
         });
       }

@@ -1,151 +1,172 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { ArrowDown, Mail, Rocket } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useProfile } from '@/hooks/useProfile';
 import { ContactModal } from './ContactModal';
+import { useProfile } from '@/hooks/useProfile';
 
 export function HeroSection() {
-  const { profile, isLoading } = useProfile();
   const [showContactModal, setShowContactModal] = useState(false);
+  const { profile } = useProfile();
 
-  const scrollToProjects = () => {
-    const element = document.getElementById('projects');
+  const handleNavClick = (id: string) => {
+    const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
-  // Determine if we should show loading state (either isLoading is true OR profile data is empty)
-  const showLoading = isLoading || !profile.name;
+  // 静态兜底文案
+  const defaultTitle = 'AI 产品方向的转型实践者';
+  const defaultSlogan = '从建筑学出发，转向 AI 产品实践';
+  const defaultDescription = '我正在从建筑学背景转向 AI 产品 / 运营方向。这个网站是我的长期实践项目，用来记录学习路径、项目尝试、工具理解和个人展示系统的持续迭代。';
+
+  // 从 profile 读取数据，有 fallback
+  const displayName = profile.name?.trim() || '';
+  const displayTitle = profile.title || defaultTitle;
+  const displaySlogan = profile.slogan || '';
+
+  // 保持主叙事一致性
+  const heroTitle = '从建筑学出发，转向 AI 产品实践';
+  const heroSubtitle = displaySlogan || (profile.title ? displayTitle : defaultDescription);
+
+  const statusCards = [
+    { title: "转型方向", body: "AI 产品 / AI 运营 / AI 应用实践" },
+    { title: "实践方式", body: "Trae、Coze、n8n、vibecoding 等工具协作" },
+    { title: "当前作品", body: "动态个人主页，从 MVP 继续迭代" },
+  ];
 
   return (
-    <section 
-      id="about"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      // 背景已移至全局 (Index.tsx)，此处保持透明
+    <section
+      className="relative min-h-screen flex items-center pt-24 pb-16"
     >
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Title */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <h1 className="text-display-sm md:text-display-lg font-bold mb-4 flex flex-col md:block items-center justify-center gap-2 tracking-tight font-display">
-              <span className="text-foreground drop-shadow-lg italic">Hi, 我是</span>{' '}
-              {showLoading ? (
-                <Skeleton className="h-20 w-64 inline-block align-middle bg-primary/10" />
-              ) : (
-                <span className="text-primary drop-shadow-glow">{profile.name}</span>
-              )}
-            </h1>
-          </motion.div>
+        <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em]">
+              <span className="pulse-dot" aria-hidden="true" />
+              <span>持续更新中</span>
+              <span className="text-muted">
+                {displayName ? `${displayName} 的个人主页` : '当前版本：从 MVP 到可迭代个人产品'}
+              </span>
+            </div>
 
-          {/* Title/Role */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="mb-8 flex justify-center"
-          >
-            {showLoading ? (
-               <Skeleton className="h-10 w-80 bg-muted/20" />
-            ) : (
-              <h2 className="text-headline-sm md:text-headline-lg text-foreground/90 font-light font-display italic tracking-wide">
-                {profile.title}
-              </h2>
-            )}
-          </motion.div>
-
-          {/* Slogan */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-            className="mb-10 max-w-2xl mx-auto flex justify-center"
-          >
-            {showLoading ? (
-              <div className="space-y-2 w-full max-w-md">
-                 <Skeleton className="h-4 w-full bg-muted/10" />
-                 <Skeleton className="h-4 w-3/4 mx-auto bg-muted/10" />
-              </div>
-            ) : (
-              <p className="text-lg md:text-headline-sm text-muted-foreground font-light leading-relaxed">
-                {profile.slogan}
+            <div className="max-w-4xl space-y-5">
+              <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted">
+                个人主页 / 转型样本 / 长期项目
               </p>
-            )}
-          </motion.div>
+              <h1 className="font-display text-5xl leading-[1.04] md:text-7xl">
+                {heroTitle}
+              </h1>
+              <p className="max-w-2xl text-base leading-8 md:text-lg text-muted">
+                {heroSubtitle}
+              </p>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  size="lg"
+                  className="interactive rounded-full px-5 py-3 text-sm font-semibold bg-foreground text-white"
+                  onClick={() => handleNavClick('core-project')}
+                >
+                  查看核心项目
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  className="interactive rounded-full border px-5 py-3 text-sm font-semibold"
+                  onClick={() => handleNavClick('learning')}
+                >
+                  了解学习路径
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="interactive rounded-full border px-5 py-3 text-sm font-semibold"
+                  onClick={() => handleNavClick('contact')}
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  获取联系方式
+                </Button>
+              </div>
+            </div>
 
-          {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <Button 
-              size="lg" 
-              onClick={scrollToProjects}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-8 shadow-glow transition-all duration-300 hover:scale-105"
-            >
-              查看我的项目
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={() => setShowContactModal(true)}
-              className="border-primary/20 text-primary hover:bg-primary/10 hover:text-primary hover:border-primary/40 gap-2 backdrop-blur-sm"
-            >
-              <Mail className="h-4 w-4" />
-              获取联系方式
-            </Button>
-          </motion.div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {statusCards.map((card) => (
+                <motion.article
+                  key={card.title}
+                  className="ui-card interactive p-5"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="text-sm font-semibold">{card.title}</div>
+                  <p className="mt-3 text-sm leading-7 text-muted">
+                    {card.body}
+                  </p>
+                </motion.article>
+              ))}
+            </div>
+          </div>
 
-          {/* Retro Guide Link */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-            className="mt-6"
+          <motion.aside
+            className="ui-card overflow-hidden"
+            style={{ boxShadow: 'var(--shadow)' }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Link to="/retro" className="inline-flex items-center gap-2 text-sm text-muted-foreground/60 hover:text-primary transition-colors group">
-              <Rocket className="h-4 w-4 group-hover:-translate-y-1 transition-transform" />
-              <span>了解我是如何用 AI 构建这个网站的</span>
-            </Link>
-          </motion.div>
-
-          {/* Scroll indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.5 }}
-            className="mt-16 md:mt-20"
-          >
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-              className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary cursor-pointer transition-colors"
-              onClick={() => {
-                const element = document.getElementById('skills');
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-            >
-              <span className="text-base font-medium">向下滚动</span>
-              <ArrowDown className="h-5 w-5" />
-            </motion.div>
-          </motion.div>
+            <div className="editorial-grid p-6 md:p-7">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-semibold">转型样本</div>
+                  <div className="mt-1 text-sm text-muted">
+                    把主页本身做成一个持续迭代的产品
+                  </div>
+                </div>
+                <div className="rounded-full border px-3 py-1 text-xs text-muted">
+                  进行中
+                </div>
+              </div>
+              <div className="mt-8 rounded-[20px] border p-5 bg-white/72">
+                <div className="flex items-center justify-between border-b pb-4">
+                  <div>
+                    <div className="text-sm font-semibold">动态个人主页系统</div>
+                    <div className="mt-1 text-xs text-muted">
+                      前台展示 / 后台管理 / 数据存储 / AI 能力入口
+                    </div>
+                  </div>
+                  <div className="font-mono text-xs text-muted">v0.9 → v1.0</div>
+                </div>
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-2xl border p-4 bg-surface">
+                    <div className="font-mono text-xs uppercase tracking-[0.16em] text-muted">前台层</div>
+                    <div className="mt-3 text-3xl font-bold">01</div>
+                    <p className="mt-3 text-sm leading-7 text-muted">
+                      个人介绍、项目展示、学习记录与联系方式。
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border p-4 bg-surface">
+                    <div className="font-mono text-xs uppercase tracking-[0.16em] text-muted">系统层</div>
+                    <div className="mt-3 text-3xl font-bold">02</div>
+                    <p className="mt-3 text-sm leading-7 text-muted">
+                      Supabase、CMS、留言审核、简历系统与部署流程。
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 rounded-2xl border p-4 bg-gradient-to-br from-accent-soft to-surface-2">
+                  <div className="text-sm font-semibold">为什么把它当核心项目</div>
+                  <p className="mt-3 text-sm leading-7 text-muted">
+                    因为它不是一次性页面，而是一个不断加入内容管理、交互入口、数据结构和叙事优化的个人产品实验场。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.aside>
         </div>
       </div>
 
-      <ContactModal 
-        open={showContactModal} 
-        onOpenChange={setShowContactModal} 
+      <ContactModal
+        open={showContactModal}
+        onOpenChange={setShowContactModal}
       />
     </section>
   );

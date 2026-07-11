@@ -100,16 +100,41 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+type ChartTooltipPayload = {
+  color?: string
+  dataKey?: string | number
+  name?: string | number
+  value?: string | number
+  payload?: Record<string, unknown>
+}
+
+type ChartTooltipContentProps = React.ComponentProps<"div"> & {
+  active?: boolean
+  payload?: ReadonlyArray<ChartTooltipPayload>
+  label?: React.ReactNode
+  labelFormatter?: (
+    label: React.ReactNode,
+    payload: ReadonlyArray<ChartTooltipPayload>
+  ) => React.ReactNode
+  formatter?: (
+    value: string | number,
+    name: string | number,
+    item: ChartTooltipPayload,
+    index: number,
+    payload?: Record<string, unknown>
+  ) => React.ReactNode
+  hideLabel?: boolean
+  hideIndicator?: boolean
+  indicator?: "line" | "dot" | "dashed"
+  nameKey?: string
+  labelKey?: string
+  labelClassName?: string
+  color?: string
+}
+
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-    React.ComponentProps<"div"> & {
-      hideLabel?: boolean
-      hideIndicator?: boolean
-      indicator?: "line" | "dot" | "dashed"
-      nameKey?: string
-      labelKey?: string
-    }
+  ChartTooltipContentProps
 >(
   (
     {
@@ -186,7 +211,10 @@ const ChartTooltipContent = React.forwardRef<
           {payload.map((item, index) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
-            const indicatorColor = color || item.payload.fill || item.color
+            const payloadFill = typeof item.payload?.fill === "string"
+              ? item.payload.fill
+              : undefined
+            const indicatorColor = color || payloadFill || item.color
 
             return (
               <div
@@ -258,8 +286,9 @@ const ChartLegend = RechartsPrimitive.Legend
 
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+  React.ComponentProps<"div"> & {
+      payload?: ReadonlyArray<RechartsPrimitive.LegendPayload>
+      verticalAlign?: "top" | "middle" | "bottom"
       hideIcon?: boolean
       nameKey?: string
     }

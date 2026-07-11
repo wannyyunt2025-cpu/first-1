@@ -9,6 +9,8 @@ import { useSkills } from '@/hooks/useSkills';
 import { useToast } from '@/hooks/use-toast';
 import { Skill } from '@/types';
 
+const suggestedCategories = ['AI工具', '产品能力', '内容运营', '工程协作', '建筑学迁移能力'];
+
 export function SkillForm() {
   const { skills, add, update, remove, reorder } = useSkills();
   const { toast } = useToast();
@@ -58,18 +60,26 @@ export function SkillForm() {
         {/* Add new skill */}
         <div className="flex flex-col sm:flex-row gap-3">
           <Input
-            placeholder="技能名称"
+            placeholder="建议技能：n8n、Coze、Trae、Vibecoding、Supabase、产品思维、信息结构、用户体验、AI 工作流"
             value={newSkillName}
             onChange={(e) => setNewSkillName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddSkill()}
             className="bg-secondary/50 flex-1"
           />
-          <Input
-            placeholder="分类（选填）"
-            value={newSkillCategory}
-            onChange={(e) => setNewSkillCategory(e.target.value)}
-            className="bg-secondary/50 sm:w-32"
-          />
+          <div className="sm:w-44">
+            <Input
+              list="skill-category-options"
+              placeholder="选择或输入分类"
+              value={newSkillCategory}
+              onChange={(e) => setNewSkillCategory(e.target.value)}
+              className="bg-secondary/50"
+            />
+            <datalist id="skill-category-options">
+              {suggestedCategories.map((category) => (
+                <option key={category} value={category} />
+              ))}
+            </datalist>
+          </div>
           <Button 
             onClick={handleAddSkill}
             className="bg-gradient-primary hover:opacity-90 gap-2"
@@ -140,7 +150,7 @@ export function SkillForm() {
 
         {/* Hint */}
         <p className="text-xs text-muted-foreground">
-          提示：权重越高的技能会在首页技能云中优先展示，前5个高权重技能会被展示
+          提示：权重越高的技能越容易出现在首页“当前定位”和联系区。建议分类统一使用：{suggestedCategories.join(' / ')}。
         </p>
       </CardContent>
     </Card>

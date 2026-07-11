@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 code_template.zip
 localhost_*.report.html
+codesign-*.html
